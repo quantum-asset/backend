@@ -47,7 +47,7 @@ FotoRouter.post("/foto", async (req, res) => {
     //tengo el file, deboleerlo, como blob
     // const fileBuffer = await readImagePromise(sampleFile);
 
- /*    const currentWorkSpace = path.isAbsolute("../")
+    /*    const currentWorkSpace = path.isAbsolute("../")
       ? imageFile.tempFilePath
       : path.join(__dirname, "..", "..", "..", imageFile.tempFilePath); */
     //console.log("currentWorkSpace", uploadPath);
