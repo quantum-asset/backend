@@ -1,0 +1,7 @@
+export const TIPO_ACTIVO_MOCK = (ID_TIPO_ACTIVO, DENOMINACION, ESTADO) => {
+  return {
+    ID_TIPO_ACTIVO,
+    DENOMINACION,
+    ESTADO,
+  };
+};

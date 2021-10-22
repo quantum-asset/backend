@@ -1,0 +1,11 @@
+export const AREA_RESPONSABLE_MOCK = (
+  ID_AREA_RESPONSABLE,
+  DENOMINACION,
+  ESTADO
+) => {
+  return {
+    ID_AREA_RESPONSABLE,
+    DENOMINACION,
+    ESTADO,
+  };
+};
