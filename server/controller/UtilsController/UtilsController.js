@@ -22,21 +22,20 @@ export const makeFilterQuery = (
 };
 
 export const makeUpdateQuery = (
-  atributos = { atributosKeys: [], atributosValues: [] }
+  atributosKeys =  []
 ) => {
-  const { atributosKeys, atributosValues } = atributos;
+  
   let queryFiltros = "";
 
-  if (filtrosKeys.length > 0) {
-    queryFiltros = "WHERE";
+  if (atributosKeys.length > 0) {
 
     //el primero o solo habia 1
-    queryFiltros += ` ${filtrosKeys[0]} = ${filtrosValues[0]}`;
+    queryFiltros += ` ${atributosKeys[0]} = ? `;
 
-    if (filtrosKeys.length > 1) {
+    if (atributosKeys.length > 1) {
       //varios filtros
-      for (let i = 1; i < filtrosValues.length; i++) {
-        queryFiltros += `, ${filtrosKeys[i]} = ${filtrosValues[i]}`;
+      for (let i = 1; i < atributosKeys.length; i++) {
+        queryFiltros += `, ${filtrosKeys[i]} = ? `;
       }
     }
   }

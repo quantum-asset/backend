@@ -1,11 +1,16 @@
-import { newResponse } from "../../response/Response.js";
-import { makeFilterQuery } from "../UtilsController/UtilsController.js";
+import { Response } from "../../response/Response.js";
+import {
+  makeFilterQuery,
+  makeUpdateQuery,
+} from "../UtilsController/UtilsController.js";
+import { connectMysql } from "../../mysql_conector.js";
 
 export class LocacionController {
   constructor() {
     this.list = list;
     this.store = store;
     this.edit = edit;
+    this.remove = remove;
   }
 }
 
@@ -17,11 +22,11 @@ const list = (filtros = { filtrosKeys: [], filtrosValues: [] }) => {
 
     conn.query(query, (err, result) => {
       if (err) {
-        resolve(newResponse("error", {}, "Error al insertar la locacion"));
+        resolve(Response.error("Error al listar locacion"));
       } else {
         console.log(result);
         resolve(
-          newResponse(
+          Response.ok(
             "success",
             result,
             "Se listaron las locaciones correctamente"
@@ -34,56 +39,61 @@ const list = (filtros = { filtrosKeys: [], filtrosValues: [] }) => {
 //
 //
 //
-const store = (tipoLocaciones) => {
+const store = (locaciones) => {
   return new Promise((resolve, reject) => {
-    const conn = connectMysql;
     //add timestamps
+    const conn = connectMysql;
 
-    const query = `INSERT INTO LOCACION SET ?`;
-    const values = tipoLocaciones;
+    const query = `INSERT INTO LOCACION (ID_TIPO_LOCACION,DIRECCION,DENOMINACION,DESCRIPCION) VALUES ?`;
+    const values = locaciones.map((x) => [
+      x.ID_TIPO_LOCACION,
+      x.DIRECCION,
+      x.DENOMINACION,
+      x.DESCRIPCION,
+    ]);
+    console.log("loc:", values);
     if (conn) {
       conn.query(query, [values], (err, result) => {
         if (err) {
           console.log("Error al insertar tipo de locacion", err);
-          resolve(
-            newResponse("error", {}, "Error al insertar tipo de locacion")
-          );
+          resolve(Response.error("Error al insertar locacion"));
         } else {
           console.log(result);
           resolve(
-            newResponse(
+            Response.ok(
               "success",
               result,
-              "Se registró el tipo de locación correctamente"
+              "Se registraron las locaciones correctamente"
             )
           );
         }
       });
+    } else {
+      resolve(Response.error("Error al conectar con la base de datos"));
     }
   });
 };
-const edit = (id, tipoLocacion) => {
-  //return new Promise((resolve, reject) => {
-    const ID_TIPO_LOCACION = id;
-    const { DENOMINACION } = tipoLocacion;
+const edit = (id, locacion) => {
+  return new Promise((resolve, reject) => {
     const conn = connectMysql;
-    //add timestamps
-    const updatedActivo = {
-      ...activo,
-      ULTIMA_MODIFICACION: new Date(),
-    };
-    var query = `UPDATE LOCACION SET DENOMINACION = '${DENOMINACION}' WHERE ID_TIPO_LOCACION = '${ID_TIPO_LOCACION}`;
+    const ID_LOCACION = id;
 
-    const values = updatedActivo;
+    //add timestamps
+    const locacionKeys = Object.keys(locacion);
+    const locacionValues = [...Object.values(locacion), ID_LOCACION];
+    var query = `UPDATE LOCACION SET ${makeUpdateQuery(
+      locacionKeys
+    )} WHERE ID_LOCACION = ?`;
+
     if (conn) {
-      conn.query(query, (err, result) => {
+      conn.query(query, locacionValues, (err, result) => {
         if (err) {
           console.log("Error al editar el Tipo Locacion", err);
-          return Promise.resolve(newResponse("error", {}, "Error al editar el Tipo Locacion"));
+          resolve(newResponse("error", {}, "Error al editar el Tipo Locacion"));
         } else {
           console.log(result);
-          return Promise.resolve(
-            newResponse(
+          resolve(
+            Response.ok(
               "success",
               result,
               "Se registró el activo correctamente"
@@ -91,6 +101,37 @@ const edit = (id, tipoLocacion) => {
           );
         }
       });
+    }else {
+      resolve(Response.error("Error al conectar con la base de datos"));
     }
-  //});
+  });
+};
+const remove = (id) => {
+  return new Promise((resolve, reject) => {
+    const conn = connectMysql;
+
+    const ID_LOCACION = id;
+    //add timestamps
+    var query = `UPDATE LOCACION SET ESTADO = 0 WHERE ID_LOCACION = '${ID_LOCACION}'`;
+
+    if (conn) {
+      conn.query(query, (err, result) => {
+        if (err) {
+          console.log("Error al eliminar el Locacion", err);
+          resolve(Response.error("Error al eliminar locacion"));
+        } else {
+          console.log(result);
+          resolve(
+            Response.ok(
+              "success",
+              result,
+              "Se eliminó la locación correctamente"
+            )
+          );
+        }
+      });
+    }else {
+      resolve(Response.error("Error al conectar con la base de datos"));
+    }
+  });
 };

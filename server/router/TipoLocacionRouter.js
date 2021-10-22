@@ -1,8 +1,9 @@
 import express from "express";
 import mysql from "mysql";
-import { TipoLocacionController } from "../controller/TipoLocacionController/TipoLocacionController.js";
+import { LocacionController } from "../controller/LocacionController/LocacionController.js";
+import { newResponse } from "../response/Response.js";
 const TipoLocacionRouter = express.Router();
-const controller = new TipoLocacionController();
+const controller = new LocacionController();
 //listar todo
 TipoLocacionRouter.get("", async (req, res) => {
   const respuesta = await controller.list();

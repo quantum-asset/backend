@@ -4,8 +4,7 @@ import dotenv from "dotenv";
 import fileUpload from "express-fileupload";
 import cors from "cors";
 import { TipoLocacionRouter } from "./server/router/TipoLocacionRouter.js";
-
-
+import { LocacionRouter } from "./server/router/LocacionRouter.js";
 
 dotenv.config();
 
@@ -27,9 +26,9 @@ app.use(cors());
 // create application/x-www-form-urlencoded parser
 
 app.use("/tipo-locacion", TipoLocacionRouter);
-/* app.use("/locacion", LocacionRouter);
+app.use("/locacion", LocacionRouter);
 
-app.use("/necesidad-tag", NecesidadTagRouter);
+/*app.use("/necesidad-tag", NecesidadTagRouter);
 
 app.use("/permiso", PermisoRouter);
 app.use("/rol", RolRouter);
@@ -55,7 +54,7 @@ app.use("/auth", AuthRouter);
 app.use("/archivo", ArchivoRouter); */
 app.get("/", (req, res) => {
   //const input = req.body;
- // console.log("body", input);
+  // console.log("body", input);
   console.log("headers", req.headers);
   console.log("params", req.params);
   console.log("body", req.body);

@@ -1,5 +1,5 @@
 import { connectMysql } from "../../mysql_conector.js";
-import { newResponse } from "../../response/Response.js";
+import {  Response } from "../../response/Response.js";
 import { makeFilterQuery } from "../UtilsController/UtilsController.js";
 
 export class TipoLocacionController {
@@ -16,21 +16,24 @@ const list = (filtros = { filtrosKeys: [], filtrosValues: [] }) => {
     const conn = connectMysql;
     const query =
       `SELECT * FROM TIPO_LOCACION` + makeFilterQuery(filtros) + ";";
-
-    conn.query(query, (err, result) => {
-      if (err) {
-        resolve(newResponse("error", {}, "Error al listar tipo de locacion"));
-      } else {
-        console.log(result);
-        resolve(
-          newResponse(
-            "success",
-            result,
-            "Se listaron los tipos de locaciones correctamente"
-          )
-        );
-      }
-    });
+    if (conn) {
+      conn.query(query, (err, result) => {
+        if (err) {
+          resolve(Response.error("Error al listar tipo de locacion"));
+        } else {
+          console.log(result);
+          resolve(
+            Response.ok(
+              "success",
+              result,
+              "Se listaron los tipos de locaciones correctamente"
+            )
+          );
+        }
+      });
+    } else {
+      resolve(Response.error("Error al conectar con la base de datos"));
+    }
   });
 };
 const store = (tipoLocacion) => {
@@ -45,13 +48,11 @@ const store = (tipoLocacion) => {
       conn.query(query, [values], (err, result) => {
         if (err) {
           console.log("Error al insertar tipo de locacion", err);
-          resolve(
-            newResponse("error", {}, "Error al insertar tipo de locacion")
-          );
+          resolve(Response.error("Error al insertar tipo de locacion"));
         } else {
           console.log(result);
           resolve(
-            newResponse(
+            Response.ok(
               "success",
               result,
               "Se registró el tipo de locación correctamente"
@@ -59,6 +60,8 @@ const store = (tipoLocacion) => {
           );
         }
       });
+    } else {
+      resolve(Response.error("Error al conectar con la base de datos"));
     }
   });
 };
@@ -75,11 +78,11 @@ const edit = (id, tipoLocacion) => {
       conn.query(query, (err, result) => {
         if (err) {
           console.log("Error al editar el Tipo Locacion", err);
-          resolve(newResponse("error", {}, "Error al editar el Tipo Locacion"));
+          resolve(Response.error("Error al editar tipo de locacion"));
         } else {
           console.log(result);
           resolve(
-            newResponse(
+            Response.ok(
               "success",
               result,
               "Se registró el activo correctamente"
@@ -87,6 +90,8 @@ const edit = (id, tipoLocacion) => {
           );
         }
       });
+    }else {
+      resolve(Response.error("Error al conectar con la base de datos"));
     }
   });
 };
@@ -101,14 +106,20 @@ const remove = (id) => {
       conn.query(query, (err, result) => {
         if (err) {
           console.log("Error al eliminar el Tipo Locacion", err);
-          resolve(newResponse("error", {}, "Error al eliminar el Tipo Locacion"));
+          resolve(Response.error("Error al eliminar tipo de locacion"));
         } else {
           console.log(result);
           resolve(
-            newResponse("success", result, "Se eliminó el tipo de locación correctamente")
+            Response.ok(
+              "success",
+              result,
+              "Se eliminó el tipo de locación correctamente"
+            )
           );
         }
       });
+    }else {
+      resolve(Response.error("Error al conectar con la base de datos"));
     }
   });
 };
