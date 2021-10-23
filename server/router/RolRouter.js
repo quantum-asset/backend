@@ -15,7 +15,7 @@ RolRouter.post("",(req, res)=>{
 });
 
 //editar uno
-RolRouter.put("",(req, res)=>{
+RolRouter.put(":id",(req, res)=>{
 });
 
 //eliminar 1

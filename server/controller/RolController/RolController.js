@@ -1,8 +1,8 @@
 import { connectMysql } from "../../mysql_conector.js";
-import {  Response } from "../../response/Response.js";
+import { Response } from "../../response/Response.js";
 import { makeFilterQuery } from "../UtilsController/UtilsController.js";
 
-export class TipoLocacionController {
+export class RolController {
   constructor() {
     this.list = list;
     this.store = store;
@@ -10,24 +10,20 @@ export class TipoLocacionController {
     this.remove = remove;
   }
 }
+
 //los filtros tipo string ya deben tener las comillas simples
 const list = (filtros = { filtrosKeys: [], filtrosValues: [] }) => {
   return new Promise((resolve, reject) => {
     const conn = connectMysql;
-    const query =
-      `SELECT * FROM TIPO_LOCACION` + makeFilterQuery(filtros) + ";";
+    const query = `SELECT * FROM ROL` + makeFilterQuery(filtros) + ";";
     if (conn) {
       conn.query(query, (err, result) => {
         if (err) {
-          resolve(Response.error("Error al listar tipo de locacion"));
+          resolve(Response.error("Error al listar rol"));
         } else {
           console.log(result);
           resolve(
-            Response.ok(
-              "success",
-              result,
-              "Se listaron los tipos de locaciones correctamente"
-            )
+            Response.ok("success", result, "Se listaron los rol correctamente")
           );
         }
       });
@@ -36,26 +32,26 @@ const list = (filtros = { filtrosKeys: [], filtrosValues: [] }) => {
     }
   });
 };
-const store = (tipoLocacion) => {
+const store = (usuarioXPermiso) => {
   return new Promise((resolve, reject) => {
     const conn = connectMysql;
     //add timestamps
 
-    const query = `INSERT INTO TIPO_LOCACION (DENOMINACION) VALUES ?`;
-    const values = tipoLocacion.map((x) => [x.DENOMINACION]);
-    console.log("tipo loc:", values);
+    const query = `INSERT INTO ROL (DENOMINACION, DESCRIPCION) VALUES ?`;
+    const values = usuarioXPermiso.map((x) => [x.DENOMINACION, x.DESCRIPCION]);
+    console.log("roles:", values);
     if (conn) {
       conn.query(query, [values], (err, result) => {
         if (err) {
-          console.log("Error al insertar tipo de locacion", err);
-          resolve(Response.error("Error al insertar tipo de locacion"));
+          console.log("Error al insertar rol", err);
+          resolve(Response.error("Error al insertar rol"));
         } else {
           console.log(result);
           resolve(
             Response.ok(
               "success",
               result,
-              "Se registró el tipo de locación correctamente"
+              "Se registró los roles correctamente"
             )
           );
         }
@@ -65,60 +61,64 @@ const store = (tipoLocacion) => {
     }
   });
 };
-const edit = (id, tipoLocacion) => {
+/**
+ * Lo unico editable seria la expiracion, para ampliar
+ * @param {*} id
+ * @param {*} usuarioXpermiso
+ * @returns
+ */
+const edit = (id, rol) => {
   return new Promise((resolve, reject) => {
-    const ID_TIPO_LOCACION = id;
-    const { DENOMINACION } = tipoLocacion;
+    const ID_ROL = id;
     const conn = connectMysql;
     //add timestamps
 
-    const query = `UPDATE TIPO_LOCACION SET DENOMINACION = '${DENOMINACION}' WHERE ID_TIPO_LOCACION = '${ID_TIPO_LOCACION}'`;
+    const rolKeys = Object.keys(rol);
+    const rolValues = [...Object.values(rol), ID_ROL];
+
+    const query = `UPDATE ROL SET ${makeUpdateQuery(rolKeys)} WHERE ID_ROL = ?`;
 
     if (conn) {
-      conn.query(query, (err, result) => {
+      conn.query(query, rolValues, (err, result) => {
         if (err) {
-          console.log("Error al editar el Tipo Locacion", err);
-          resolve(Response.error("Error al editar tipo de locacion"));
+          console.log("Error al editar el rol", err);
+          resolve(Response.error("Error al editar rol"));
         } else {
           console.log(result);
           resolve(
             Response.ok(
               "success",
               result,
-              "Se editó el tipo de locación correctamente"
+              "Se editó el usuario x permiso correctamente"
             )
           );
         }
       });
-    }else {
+    } else {
       resolve(Response.error("Error al conectar con la base de datos"));
     }
   });
 };
 const remove = (id) => {
   return new Promise((resolve, reject) => {
-    const ID_TIPO_LOCACION = id;
+    const ID_ROL = id;
     const conn = connectMysql;
     //add timestamps
-    const query = `UPDATE TIPO_LOCACION SET ESTADO = 0 WHERE ID_TIPO_LOCACION = '${ID_TIPO_LOCACION}'`;
+    const query = `DELETE FROM ROL WHERE ID_ROL = '${ID_ROL}'`;
 
     if (conn) {
       conn.query(query, (err, result) => {
         if (err) {
-          console.log("Error al eliminar el Tipo Locacion", err);
-          resolve(Response.error("Error al eliminar tipo de locacion"));
+          console.log("Error al eliminar el rol", err);
+          resolve(Response.error("Error al eliminar rol"));
         } else {
           console.log(result);
           resolve(
-            Response.ok(
-              "success",
-              result,
-              "Se eliminó el tipo de locación correctamente"
-            )
+            Response.ok("success", result, "Se eliminó el rol correctamente")
           );
         }
       });
-    }else {
+    } else {
       resolve(Response.error("Error al conectar con la base de datos"));
     }
   });

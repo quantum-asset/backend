@@ -5,6 +5,8 @@ import fileUpload from "express-fileupload";
 import cors from "cors";
 import { TipoLocacionRouter } from "./server/router/TipoLocacionRouter.js";
 import { LocacionRouter } from "./server/router/LocacionRouter.js";
+import { PermisoRouter } from "./server/router/PermisoRouter.js";
+import { RolRouter } from "./server/router/RolRouter.js";
 
 dotenv.config();
 
@@ -28,10 +30,11 @@ app.use(cors());
 app.use("/tipo-locacion", TipoLocacionRouter);
 app.use("/locacion", LocacionRouter);
 
-/*app.use("/necesidad-tag", NecesidadTagRouter);
-
 app.use("/permiso", PermisoRouter);
 app.use("/rol", RolRouter);
+/*app.use("/necesidad-tag", NecesidadTagRouter);
+
+
 
 app.use("/necesidad-tag", UsuarioRouter);
 app.use("/transaccion", TransaccionRouter);

@@ -81,7 +81,7 @@ const edit = (id, locacion) => {
     //add timestamps
     const locacionKeys = Object.keys(locacion);
     const locacionValues = [...Object.values(locacion), ID_LOCACION];
-    var query = `UPDATE LOCACION SET ${makeUpdateQuery(
+    const query = `UPDATE LOCACION SET ${makeUpdateQuery(
       locacionKeys
     )} WHERE ID_LOCACION = ?`;
 
@@ -112,7 +112,7 @@ const remove = (id) => {
 
     const ID_LOCACION = id;
     //add timestamps
-    var query = `UPDATE LOCACION SET ESTADO = 0 WHERE ID_LOCACION = '${ID_LOCACION}'`;
+    const query = `UPDATE LOCACION SET ESTADO = 0 WHERE ID_LOCACION = '${ID_LOCACION}'`;
 
     if (conn) {
       conn.query(query, (err, result) => {

@@ -1,8 +1,8 @@
 import { connectMysql } from "../../mysql_conector.js";
-import {  Response } from "../../response/Response.js";
+import { Response } from "../../response/Response.js";
 import { makeFilterQuery } from "../UtilsController/UtilsController.js";
 
-export class TipoLocacionController {
+export class PermisoController {
   constructor() {
     this.list = list;
     this.store = store;
@@ -14,19 +14,18 @@ export class TipoLocacionController {
 const list = (filtros = { filtrosKeys: [], filtrosValues: [] }) => {
   return new Promise((resolve, reject) => {
     const conn = connectMysql;
-    const query =
-      `SELECT * FROM TIPO_LOCACION` + makeFilterQuery(filtros) + ";";
+    const query = `SELECT * FROM PERMISO` + makeFilterQuery(filtros) + ";";
     if (conn) {
       conn.query(query, (err, result) => {
         if (err) {
-          resolve(Response.error("Error al listar tipo de locacion"));
+          resolve(Response.error("Error al listar permiso"));
         } else {
           console.log(result);
           resolve(
             Response.ok(
               "success",
               result,
-              "Se listaron los tipos de locaciones correctamente"
+              "Se listaron los permisos correctamente"
             )
           );
         }
@@ -41,21 +40,21 @@ const store = (tipoLocacion) => {
     const conn = connectMysql;
     //add timestamps
 
-    const query = `INSERT INTO TIPO_LOCACION (DENOMINACION) VALUES ?`;
+    const query = `INSERT INTO PERMISO (DENOMINACION) VALUES ?`;
     const values = tipoLocacion.map((x) => [x.DENOMINACION]);
     console.log("tipo loc:", values);
     if (conn) {
       conn.query(query, [values], (err, result) => {
         if (err) {
-          console.log("Error al insertar tipo de locacion", err);
-          resolve(Response.error("Error al insertar tipo de locacion"));
+          console.log("Error al insertar permiso", err);
+          resolve(Response.error("Error al insertar permiso"));
         } else {
           console.log(result);
           resolve(
             Response.ok(
               "success",
               result,
-              "Se registró el tipo de locación correctamente"
+              "Se registró el permiso correctamente"
             )
           );
         }
@@ -65,60 +64,56 @@ const store = (tipoLocacion) => {
     }
   });
 };
-const edit = (id, tipoLocacion) => {
+const edit = (id, permiso) => {
   return new Promise((resolve, reject) => {
-    const ID_TIPO_LOCACION = id;
-    const { DENOMINACION } = tipoLocacion;
+    const ID_PERMISO = id;
+    const { DENOMINACION } = permiso;
     const conn = connectMysql;
     //add timestamps
 
-    const query = `UPDATE TIPO_LOCACION SET DENOMINACION = '${DENOMINACION}' WHERE ID_TIPO_LOCACION = '${ID_TIPO_LOCACION}'`;
+    const query = `UPDATE PERMISO SET DENOMINACION = '${DENOMINACION}' WHERE ID_PERMISO = '${ID_PERMISO}'`;
 
     if (conn) {
       conn.query(query, (err, result) => {
         if (err) {
-          console.log("Error al editar el Tipo Locacion", err);
-          resolve(Response.error("Error al editar tipo de locacion"));
+          console.log("Error al editar el permiso", err);
+          resolve(Response.error("Error al editar permiso"));
         } else {
           console.log(result);
           resolve(
-            Response.ok(
-              "success",
-              result,
-              "Se editó el tipo de locación correctamente"
-            )
+            Response.ok("success", result, "Se editó el permiso correctamente")
           );
         }
       });
-    }else {
+    } else {
       resolve(Response.error("Error al conectar con la base de datos"));
     }
   });
 };
 const remove = (id) => {
   return new Promise((resolve, reject) => {
-    const ID_TIPO_LOCACION = id;
+    const ID_PERMISO = id;
     const conn = connectMysql;
     //add timestamps
-    const query = `UPDATE TIPO_LOCACION SET ESTADO = 0 WHERE ID_TIPO_LOCACION = '${ID_TIPO_LOCACION}'`;
+    const query = `UPDATE PERMISO SET ESTADO = 0 WHERE ID_PERMISO = '${ID_PERMISO}'`;
 
     if (conn) {
       conn.query(query, (err, result) => {
         if (err) {
-          console.log("Error al eliminar el Tipo Locacion", err);
-          resolve(Response.error("Error al eliminar tipo de locacion"));
+          console.log("Error al eliminar el permiso", err);
+          resolve(Response.error("Error al eliminar permiso"));
         } else {
           console.log(result);
           resolve(
             Response.ok(
               "success",
               result,
-              "Se eliminó el tipo de locación correctamente"
+              "Se eliminó el permiso correctamente"
             )
           );
         }
       });
-    }else {
+    } else {
       resolve(Response.error("Error al conectar con la base de datos"));
     }
   });
