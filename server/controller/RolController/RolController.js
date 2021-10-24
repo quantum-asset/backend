@@ -1,6 +1,6 @@
 import { connectMysql } from "../../mysql_conector.js";
 import { Response } from "../../response/Response.js";
-import { makeFilterQuery } from "../UtilsController/UtilsController.js";
+import { makeFilterQuery, makeUpdateQuery } from "../UtilsController/UtilsController.js";
 
 export class RolController {
   constructor() {
@@ -38,7 +38,10 @@ const store = (usuarioXPermiso) => {
     //add timestamps
 
     const query = `INSERT INTO ROL (DENOMINACION, DESCRIPCION) VALUES ?`;
-    const values = usuarioXPermiso.map((x) => [x.DENOMINACION, x.DESCRIPCION]);
+    const values = usuarioXPermiso.map((x) => [
+      x.DENOMINACION,
+      x.DESCRIPCION || null,
+    ]);
     console.log("roles:", values);
     if (conn) {
       conn.query(query, [values], (err, result) => {
@@ -89,7 +92,7 @@ const edit = (id, rol) => {
             Response.ok(
               "success",
               result,
-              "Se editó el usuario x permiso correctamente"
+              "Se editó el rol correctamente"
             )
           );
         }
@@ -99,6 +102,11 @@ const edit = (id, rol) => {
     }
   });
 };
+/**
+ * Borrado físico del Rol en esta tabla
+ * @param {*} id 
+ * @returns 
+ */
 const remove = (id) => {
   return new Promise((resolve, reject) => {
     const ID_ROL = id;

@@ -7,6 +7,12 @@ import { TipoLocacionRouter } from "./server/router/TipoLocacionRouter.js";
 import { LocacionRouter } from "./server/router/LocacionRouter.js";
 import { PermisoRouter } from "./server/router/PermisoRouter.js";
 import { RolRouter } from "./server/router/RolRouter.js";
+import { UsuarioRouter } from "./server/router/UsuarioRouter.js";
+/*
+1) agregar auditoria en cada post, put y delete de los controllers
+*/
+
+
 
 dotenv.config();
 
@@ -32,6 +38,7 @@ app.use("/locacion", LocacionRouter);
 
 app.use("/permiso", PermisoRouter);
 app.use("/rol", RolRouter);
+app.use("/usuario", UsuarioRouter);
 /*app.use("/necesidad-tag", NecesidadTagRouter);
 
 

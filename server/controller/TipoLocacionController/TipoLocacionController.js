@@ -1,5 +1,5 @@
 import { connectMysql } from "../../mysql_conector.js";
-import {  Response } from "../../response/Response.js";
+import { Response } from "../../response/Response.js";
 import { makeFilterQuery } from "../UtilsController/UtilsController.js";
 
 export class TipoLocacionController {
@@ -16,9 +16,12 @@ const list = (filtros = { filtrosKeys: [], filtrosValues: [] }) => {
     const conn = connectMysql;
     const query =
       `SELECT * FROM TIPO_LOCACION` + makeFilterQuery(filtros) + ";";
+    console.log("query: ", query);
     if (conn) {
       conn.query(query, (err, result) => {
         if (err) {
+          console.log("query: ", err);
+
           resolve(Response.error("Error al listar tipo de locacion"));
         } else {
           console.log(result);
@@ -90,7 +93,7 @@ const edit = (id, tipoLocacion) => {
           );
         }
       });
-    }else {
+    } else {
       resolve(Response.error("Error al conectar con la base de datos"));
     }
   });
@@ -118,7 +121,7 @@ const remove = (id) => {
           );
         }
       });
-    }else {
+    } else {
       resolve(Response.error("Error al conectar con la base de datos"));
     }
   });

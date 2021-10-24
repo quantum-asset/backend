@@ -1,62 +1,161 @@
-export const iniciarSesion = (body) => {
-  if (!body) {
-    return {
-      status: "fail",
-      timeStamp: new Date(),
-      message: "No se adjuntaron los datos",
-      payload: {},
-    };
+import { connectMysql } from "../../mysql_conector.js";
+import { Response } from "../../response/Response.js";
+import {
+  makeFilterQuery,
+  makeUpdateQuery,
+} from "../UtilsController/UtilsController.js";
+
+export class UsuarioController {
+  constructor() {
+    this.list = list;
+    this.store = store;
+    this.edit = edit;
+    this.remove = remove;
+    this.setFile=setFile;
+
   }
-  const { correo, contrasenia } = body;
-  if (!correo || !contrasenia) {
-    return {
-      status: "fail",
-      timeStamp: new Date(),
-      message: "Correo o contraseña no fueron ingresados",
-      payload: {},
-    };
-  }
-  if (correo === "encargado_control") {
-    return {
-      status: "ok",
-      timeStamp: new Date(),
-      message: "Inicio de sesion exitoso",
-      payload: ENCARGADO_CONTROL,
-    };
-  } else if (correo === "encargado_toma") {
-    return {
-      status: "ok",
-      timeStamp: new Date(),
-      message: "Inicio de sesion exitoso",
-      payload: ENCARGADO_TOMA,
-    };
-  } else {
-    return {
-      status: "fail",
-      timeStamp: new Date(),
-      message: "Correo o contraseña ingresados incorrectamente",
-      payload: {},
-    };
-  }
+}
+
+//los filtros tipo string ya deben tener las comillas simples
+const list = (filtros = { filtrosKeys: [], filtrosValues: [] }) => {
+  return new Promise((resolve, reject) => {
+    const conn = connectMysql;
+    const query = `SELECT * FROM USUARIO` + makeFilterQuery(filtros) + ";";
+    if (conn) {
+      conn.query(query, (err, result) => {
+        if (err) {
+          resolve(Response.error("Error al listar usuarios"));
+        } else {
+          console.log(result);
+          resolve(
+            Response.ok(
+              "success",
+              result,
+              "Se listaron los usuarios correctamente"
+            )
+          );
+        }
+      });
+    } else {
+      resolve(Response.error("Error al conectar con la base de datos"));
+    }
+  });
+};
+const store = (usuario) => {
+  return new Promise((resolve, reject) => {
+    const conn = connectMysql;
+    //add timestamps
+
+    const query = `INSERT INTO USUARIO (ID_LOCACION,ID_ROL,ID_ARCHIVO, CORREO, NOMBRES, PRIMER_APELLIDO, SEGUNDO_APELLIDO, TIPO_DOCUMENTO_IDENTIDAD, NUM_DOCUMENTO_IDENTIDAD, FECHA_CREACION, ULTIMA_MODIFICACION) VALUES ?`;
+    const values = usuario.map((x) => [
+      x.ID_LOCACION,
+      x.ID_ROL,
+      x.ID_ARCHIVO ? x.ID_ARCHIVO : null,
+      x.CORREO,
+      x.NOMBRES,
+      x.PRIMER_APELLIDO,
+      x.SEGUNDO_APELLIDO,
+      x.TIPO_DOCUMENTO_IDENTIDAD,
+      x.NUM_DOCUMENTO_IDENTIDAD,
+      new Date(),
+      new Date(),
+    ]);
+    console.log("USUARIOS:", values);
+    if (conn) {
+      conn.query(query, [values], (err, result) => {
+        if (err) {
+          console.log("Error al insertar usuario", err);
+          resolve(Response.error("Error al insertar usuario"));
+        } else {
+          console.log(result);
+          resolve(
+            Response.ok(
+              "success",
+              result,
+              "Se registró los usuarios correctamente"
+            )
+          );
+        }
+      });
+    } else {
+      resolve(Response.error("Error al conectar con la base de datos"));
+    }
+  });
+};
+/**
+ * Lo unico editable seria la expiracion, para ampliar
+ * @param {*} id
+ * @param {*} usuarioXpermiso
+ * @returns
+ */
+const edit = (id, usuario) => {
+  return new Promise((resolve, reject) => {
+    const ID_USUARIO = id;
+    const conn = connectMysql;
+    //add timestamps
+    const ULTIMA_MODIFICACION = new Date();
+    const usuarioKeys = [...Object.keys(usuario), "ULTIMA_MODIFICACION"];
+    const usuarioValues = [
+      ...Object.values(usuario),
+      ULTIMA_MODIFICACION,
+      ID_USUARIO,
+    ];
+
+    const query = `UPDATE USUARIO SET ${makeUpdateQuery(
+      usuarioKeys
+    )}  WHERE ID_USUARIO = ?`;
+
+    if (conn) {
+      conn.query(query, usuarioValues, (err, result) => {
+        if (err) {
+          console.log("Error al editar el usuario", err);
+          resolve(Response.error("Error al editar usuario"));
+        } else {
+          console.log(result);
+          resolve(
+            Response.ok("success", result, "Se editó el usuario correctamente")
+          );
+        }
+      });
+    } else {
+      resolve(Response.error("Error al conectar con la base de datos"));
+    }
+  });
+};
+/**
+ * Borrado físico del Rol en esta tabla
+ * @param {*} id
+ * @returns
+ */
+const remove = (id) => {
+  return new Promise((resolve, reject) => {
+    const ID_USUARIO = id;
+    const conn = connectMysql;
+    //add timestamps
+    const query = `UPDATE USUARIO SET ESTADO = 0 WHERE ID_USUARIO = '${ID_USUARIO}'`;
+    console.log("query", query);
+    if (conn) {
+      conn.query(query, (err, result) => {
+        if (err) {
+          console.log("Error al eliminar el USUARIO", err);
+          resolve(Response.error("Error al eliminar USUARIO"));
+        } else {
+          console.log(result);
+          resolve(
+            Response.ok(
+              "success",
+              result,
+              "Se eliminó el USUARIO correctamente"
+            )
+          );
+        }
+      });
+    } else {
+      resolve(Response.error("Error al conectar con la base de datos"));
+    }
+  });
 };
 
-const ENCARGADO_CONTROL = {
-  ID_USUARIO: 4156,
-  ID_LOCACION: 64,
-  CORREO: "encargado_control@quantumasset.com",
-  NOMBRES: "Sofia Elena",
-  APELLIDO_PATERNO: "Del Rio",
-  APELLIDO_MATERNO: "Jimenez",
-  TIPO_DOCUMETNTO: "DNI",
-  NUM_DOCUMENTO_IDENTIDAD: "6196516546",
-};
-const ENCARGADO_TOMA = {
-  ID_USUARIO: 336,
-  ID_LOCACION: 4,
-  CORREO: "encargado_toma@quantumasset.com",
-  NOMBRES: "Aylen",
-  APELLIDO_PATERNO: "Huaite",
-  APELLIDO_MATERNO: "Gonzales",
-  TIPO_DOCUMETNTO: "DNI",
-  NUM_DOCUMENTO_IDENTIDAD: "9846161966",
-};
+const setFile = (id, file)=>{
+
+}

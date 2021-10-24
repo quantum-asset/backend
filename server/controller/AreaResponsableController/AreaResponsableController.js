@@ -1,3 +1,4 @@
+
 import { Response } from "../../response/Response.js";
 import {
   makeFilterQuery,
@@ -5,7 +6,7 @@ import {
 } from "../UtilsController/UtilsController.js";
 import { connectMysql } from "../../mysql_conector.js";
 
-export class LocacionController {
+export class AreaResponsableController {
   constructor() {
     this.list = list;
     this.store = store;
@@ -18,20 +19,16 @@ export class LocacionController {
 const list = (filtros = { filtrosKeys: [], filtrosValues: [] }) => {
   return new Promise((resolve, reject) => {
     const conn = connectMysql;
-    console.log("Filtros:",makeFilterQuery(filtros));
-    const query = `SELECT * FROM LOCACION` + makeFilterQuery(filtros) + ";";
+    console.log("Filtros:", makeFilterQuery(filtros));
+    const query = `SELECT * FROM AREA_RESPONSABLE` + makeFilterQuery(filtros) + ";";
 
     conn.query(query, (err, result) => {
       if (err) {
-        resolve(Response.error("Error al listar locacion"));
+        resolve(Response.error("Error al listar AREA RESPONSABLES"));
       } else {
         console.log(result);
         resolve(
-          Response.ok(
-            "success",
-            result,
-            "Se listaron las locaciones correctamente"
-          )
+          Response.ok("success", result, "Se listaron los AREA RESPONSABLES correctamente")
         );
       }
     });
@@ -40,23 +37,20 @@ const list = (filtros = { filtrosKeys: [], filtrosValues: [] }) => {
 //
 //
 //
-const store = (locaciones) => {
+const store = (areasResponsables) => {
   return new Promise((resolve, reject) => {
     //add timestamps
     const conn = connectMysql;
 
-    const query = `INSERT INTO LOCACION (ID_TIPO_LOCACION,DIRECCION,DENOMINACION,DESCRIPCION) VALUES ?`;
-    const values = locaciones.map((x) => [
-      x.ID_TIPO_LOCACION,
-      x.DIRECCION,
+    const query = `INSERT INTO AREA_RESPONSABLE (DENOMINACION) VALUES ?`;
+    const values = areasResponsables.map((x) => [
       x.DENOMINACION,
-      x.DESCRIPCION,
     ]);
-    console.log("loc:", values);
+    console.log("AREA RESPONSABLES:", values);
     if (conn) {
       conn.query(query, [values], (err, result) => {
         if (err) {
-          console.log("Error al insertar tipo de locacion", err);
+          console.log("Error al insertar AREA RESPONSABLES", err);
           resolve(Response.error("Error al insertar locacion"));
         } else {
           console.log(result);
@@ -64,7 +58,7 @@ const store = (locaciones) => {
             Response.ok(
               "success",
               result,
-              "Se registraron las locaciones correctamente"
+              "Se registraron los AREA RESPONSABLES correctamente"
             )
           );
         }
@@ -74,35 +68,30 @@ const store = (locaciones) => {
     }
   });
 };
-const edit = (id, locacion) => {
+const edit = (id, areaResponsable) => {
   return new Promise((resolve, reject) => {
     const conn = connectMysql;
-    const ID_LOCACION = id;
+    const ID_AREA_RESPONSABLE = id;
 
-    //add timestamps
-    const locacionKeys = Object.keys(locacion);
-    const locacionValues = [...Object.values(locacion), ID_LOCACION];
-    const query = `UPDATE LOCACION SET ${makeUpdateQuery(
-      locacionKeys
-    )} WHERE ID_LOCACION = ?`;
+    const areaResponsableKeys = Object.keys(areaResponsable);
+    const areaResponsableValues = [...Object.values(areaResponsable), ID_AREA_RESPONSABLE];
+    const query = `UPDATE AREA_RESPONSABLE SET ${makeUpdateQuery(
+        areaResponsableKeys
+    )} WHERE ID_AREA_RESPONSABLE = ?`;
 
     if (conn) {
-      conn.query(query, locacionValues, (err, result) => {
+      conn.query(query, areaResponsableValues, (err, result) => {
         if (err) {
-          console.log("Error al editar el Tipo Locacion", err);
-          resolve(newResponse("error", {}, "Error al editar el Tipo Locacion"));
+          console.log("Error al editar el Area responsable", err);
+          resolve(newResponse("error", {}, "Error al editar el Area responsable"));
         } else {
           console.log(result);
           resolve(
-            Response.ok(
-              "success",
-              result,
-              "Se registró el activo correctamente"
-            )
+            Response.ok("success", result, "Se registró el Area responsable correctamente")
           );
         }
       });
-    }else {
+    } else {
       resolve(Response.error("Error al conectar con la base de datos"));
     }
   });
@@ -110,28 +99,23 @@ const edit = (id, locacion) => {
 const remove = (id) => {
   return new Promise((resolve, reject) => {
     const conn = connectMysql;
-
-    const ID_LOCACION = id;
+    const ID_AREA_RESPONSABLE = id;
     //add timestamps
-    const query = `UPDATE LOCACION SET ESTADO = 0 WHERE ID_LOCACION = '${ID_LOCACION}'`;
+    const query = `UPDATE AREA_RESPONSABLE SET ESTADO = 0 WHERE ID_AREA_RESPONSABLE = '${ID_AREA_RESPONSABLE}'`;
 
     if (conn) {
       conn.query(query, (err, result) => {
         if (err) {
-          console.log("Error al eliminar el Locacion", err);
-          resolve(Response.error("Error al eliminar locacion"));
+          console.log("Error al eliminar el AREA RESPONSABLES", err);
+          resolve(Response.error("Error al eliminar AREA RESPONSABLES"));
         } else {
           console.log(result);
           resolve(
-            Response.ok(
-              "success",
-              result,
-              "Se eliminó la locación correctamente"
-            )
+            Response.ok("success", result, "Se eliminó el AREA RESPONSABLES correctamente")
           );
         }
       });
-    }else {
+    } else {
       resolve(Response.error("Error al conectar con la base de datos"));
     }
   });

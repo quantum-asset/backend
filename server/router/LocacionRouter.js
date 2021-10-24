@@ -9,8 +9,12 @@ const controller = new LocacionController();
 
 //listar todo
 LocacionRouter.get("", async (req, res) => {
-  let result = await controller.list();
-  res.status(200).send(result);
+  const q = req.query;
+  const respuesta = await controller.list({
+    filtrosKeys: Object.keys(q),
+    filtrosValues: Object.values(q),
+  });
+  res.status(200).send(respuesta);
 });
 
 //insertar 1 o varios

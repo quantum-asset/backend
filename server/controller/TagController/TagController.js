@@ -5,7 +5,7 @@ import {
 } from "../UtilsController/UtilsController.js";
 import { connectMysql } from "../../mysql_conector.js";
 
-export class LocacionController {
+export class TagController {
   constructor() {
     this.list = list;
     this.store = store;
@@ -18,20 +18,16 @@ export class LocacionController {
 const list = (filtros = { filtrosKeys: [], filtrosValues: [] }) => {
   return new Promise((resolve, reject) => {
     const conn = connectMysql;
-    console.log("Filtros:",makeFilterQuery(filtros));
-    const query = `SELECT * FROM LOCACION` + makeFilterQuery(filtros) + ";";
+    console.log("Filtros:", makeFilterQuery(filtros));
+    const query = `SELECT * FROM TAG` + makeFilterQuery(filtros) + ";";
 
     conn.query(query, (err, result) => {
       if (err) {
-        resolve(Response.error("Error al listar locacion"));
+        resolve(Response.error("Error al listar tags"));
       } else {
         console.log(result);
         resolve(
-          Response.ok(
-            "success",
-            result,
-            "Se listaron las locaciones correctamente"
-          )
+          Response.ok("success", result, "Se listaron los tags correctamente")
         );
       }
     });
@@ -40,23 +36,24 @@ const list = (filtros = { filtrosKeys: [], filtrosValues: [] }) => {
 //
 //
 //
-const store = (locaciones) => {
+const store = (tags) => {
   return new Promise((resolve, reject) => {
     //add timestamps
     const conn = connectMysql;
 
-    const query = `INSERT INTO LOCACION (ID_TIPO_LOCACION,DIRECCION,DENOMINACION,DESCRIPCION) VALUES ?`;
-    const values = locaciones.map((x) => [
-      x.ID_TIPO_LOCACION,
-      x.DIRECCION,
-      x.DENOMINACION,
-      x.DESCRIPCION,
+    const query = `INSERT INTO TAG (ID_LOCACION,ID_USUARIO,CODIGO,DENOMINACION,DESCRIPCION, FECHA_CREACION, ULTIMA_MODIFICACION) VALUES ?`;
+    const values = tags.map((x) => [
+      x.ID_LOCACION,
+      x.ID_USUARIO,
+      x.CODIGO,
+      new Date(),
+      new Date(),
     ]);
-    console.log("loc:", values);
+    console.log("TAGS:", values);
     if (conn) {
       conn.query(query, [values], (err, result) => {
         if (err) {
-          console.log("Error al insertar tipo de locacion", err);
+          console.log("Error al insertar tag", err);
           resolve(Response.error("Error al insertar locacion"));
         } else {
           console.log(result);
@@ -64,7 +61,7 @@ const store = (locaciones) => {
             Response.ok(
               "success",
               result,
-              "Se registraron las locaciones correctamente"
+              "Se registraron los tags correctamente"
             )
           );
         }
@@ -74,35 +71,32 @@ const store = (locaciones) => {
     }
   });
 };
-const edit = (id, locacion) => {
+const edit = (id, tag) => {
   return new Promise((resolve, reject) => {
     const conn = connectMysql;
-    const ID_LOCACION = id;
+    const ID_TAG = id;
+    const ULTIMA_MODIFICACION = new Date();
 
     //add timestamps
-    const locacionKeys = Object.keys(locacion);
-    const locacionValues = [...Object.values(locacion), ID_LOCACION];
-    const query = `UPDATE LOCACION SET ${makeUpdateQuery(
-      locacionKeys
-    )} WHERE ID_LOCACION = ?`;
+    const tagKeys = [...Object.keys(tag), "ULTIMA_MODIFICACION"];
+    const tagValues = [...Object.values(tag), ULTIMA_MODIFICACION, ID_TAG];
+    const query = `UPDATE TAG SET ${makeUpdateQuery(
+        tagKeys
+    )} WHERE ID_TAG = ?`;
 
     if (conn) {
-      conn.query(query, locacionValues, (err, result) => {
+      conn.query(query, tagValues, (err, result) => {
         if (err) {
-          console.log("Error al editar el Tipo Locacion", err);
-          resolve(newResponse("error", {}, "Error al editar el Tipo Locacion"));
+          console.log("Error al editar el Tag", err);
+          resolve(newResponse("error", {}, "Error al editar el Tag"));
         } else {
           console.log(result);
           resolve(
-            Response.ok(
-              "success",
-              result,
-              "Se registró el activo correctamente"
-            )
+            Response.ok("success", result, "Se registró el tag correctamente")
           );
         }
       });
-    }else {
+    } else {
       resolve(Response.error("Error al conectar con la base de datos"));
     }
   });
@@ -110,28 +104,23 @@ const edit = (id, locacion) => {
 const remove = (id) => {
   return new Promise((resolve, reject) => {
     const conn = connectMysql;
-
-    const ID_LOCACION = id;
+    const ID_TAG = id;
     //add timestamps
-    const query = `UPDATE LOCACION SET ESTADO = 0 WHERE ID_LOCACION = '${ID_LOCACION}'`;
+    const query = `UPDATE TAG SET ESTADO = 0 WHERE ID_TAG = '${ID_TAG}'`;
 
     if (conn) {
       conn.query(query, (err, result) => {
         if (err) {
-          console.log("Error al eliminar el Locacion", err);
-          resolve(Response.error("Error al eliminar locacion"));
+          console.log("Error al eliminar el tag", err);
+          resolve(Response.error("Error al eliminar tag"));
         } else {
           console.log(result);
           resolve(
-            Response.ok(
-              "success",
-              result,
-              "Se eliminó la locación correctamente"
-            )
+            Response.ok("success", result, "Se eliminó el tag correctamente")
           );
         }
       });
-    }else {
+    } else {
       resolve(Response.error("Error al conectar con la base de datos"));
     }
   });

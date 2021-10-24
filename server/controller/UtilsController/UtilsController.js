@@ -5,7 +5,7 @@ export const makeFilterQuery = (
   let queryFiltros = "";
 
   if (filtrosKeys.length > 0) {
-    queryFiltros = "WHERE";
+    queryFiltros = " WHERE";
 
     //el primero o solo habia 1
     queryFiltros += ` ${filtrosKeys[0]} = ${filtrosValues[0]}`;
@@ -35,7 +35,7 @@ export const makeUpdateQuery = (
     if (atributosKeys.length > 1) {
       //varios filtros
       for (let i = 1; i < atributosKeys.length; i++) {
-        queryFiltros += `, ${filtrosKeys[i]} = ? `;
+        queryFiltros += `, ${atributosKeys[i]} = ? `;
       }
     }
   }

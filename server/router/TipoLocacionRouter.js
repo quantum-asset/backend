@@ -1,12 +1,17 @@
 import express from "express";
 import mysql from "mysql";
-import { LocacionController } from "../controller/LocacionController/LocacionController.js";
+import { TipoLocacionController } from "../controller/TipoLocacionController/TipoLocacionController.js";
 import { newResponse } from "../response/Response.js";
 const TipoLocacionRouter = express.Router();
-const controller = new LocacionController();
+const controller = new TipoLocacionController();
 //listar todo
 TipoLocacionRouter.get("", async (req, res) => {
-  const respuesta = await controller.list();
+  const q = req.query;
+  console.log("query", q);
+  const respuesta = await controller.list({
+    filtrosKeys: Object.keys(q),
+    filtrosValues: Object.values(q),
+  });
 
   if (respuesta) {
     res.status(200).send(respuesta);
