@@ -8,11 +8,10 @@ import { LocacionRouter } from "./server/router/LocacionRouter.js";
 import { PermisoRouter } from "./server/router/PermisoRouter.js";
 import { RolRouter } from "./server/router/RolRouter.js";
 import { UsuarioRouter } from "./server/router/UsuarioRouter.js";
+import { Mailer } from "./utils/mailer.js";
 /*
 1) agregar auditoria en cada post, put y delete de los controllers
 */
-
-
 
 dotenv.config();
 
@@ -32,7 +31,16 @@ app.use(
 );
 app.use(cors());
 // create application/x-www-form-urlencoded parser
-
+app.get("/", async (req, res) => {
+  try {
+    const response = await Mailer.sendMessage({
+      message: "HAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaaa",
+    });
+    res.send({ response: response });
+  } catch (error) {
+    res.send({ response: error });
+  }
+});
 app.use("/tipo-locacion", TipoLocacionRouter);
 app.use("/locacion", LocacionRouter);
 

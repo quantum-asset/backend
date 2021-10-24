@@ -1,3 +1,4 @@
+import { Hasher } from "../../../utils/utils.js";
 import { connectMysql } from "../../mysql_conector.js";
 import { Response } from "../../response/Response.js";
 import {
@@ -5,14 +6,22 @@ import {
   makeUpdateQuery,
 } from "../UtilsController/UtilsController.js";
 
+/* console.log("hasher SSJ hex =>", Hasher.encode("haaaaa"));
+console.log(
+  "hasher SSJ hex =>",
+  Hasher.compare(
+    "haaaaa",
+    "7120bafbf7574b3ef3b8f5279782340272d98c512b906b2bc9cb4e5e99649d207120bafbf7574b3ef3b8f5279782340272d98c512b906b2bc9cb4e5e99649d20"
+  )
+);
+console.log("default psswrd",Hasher.random()); */
 export class UsuarioController {
   constructor() {
     this.list = list;
     this.store = store;
     this.edit = edit;
     this.remove = remove;
-    this.setFile=setFile;
-
+    this.setFile = setFile;
   }
 }
 
@@ -42,16 +51,19 @@ const list = (filtros = { filtrosKeys: [], filtrosValues: [] }) => {
   });
 };
 const store = (usuario) => {
-  return new Promise((resolve, reject) => {
+  return new Promise(async (resolve, reject) => {
     const conn = connectMysql;
     //add timestamps
+    //console.log("sha", SHA);
+    //console.log("h256", sha256);
+    const query = `INSERT INTO USUARIO (ID_LOCACION,ID_ROL,ID_ARCHIVO, CORREO, CONTRASENIA, NOMBRES, PRIMER_APELLIDO, SEGUNDO_APELLIDO, TIPO_DOCUMENTO_IDENTIDAD, NUM_DOCUMENTO_IDENTIDAD, FECHA_CREACION, ULTIMA_MODIFICACION) VALUES ?`;
 
-    const query = `INSERT INTO USUARIO (ID_LOCACION,ID_ROL,ID_ARCHIVO, CORREO, NOMBRES, PRIMER_APELLIDO, SEGUNDO_APELLIDO, TIPO_DOCUMENTO_IDENTIDAD, NUM_DOCUMENTO_IDENTIDAD, FECHA_CREACION, ULTIMA_MODIFICACION) VALUES ?`;
     const values = usuario.map((x) => [
       x.ID_LOCACION,
       x.ID_ROL,
       x.ID_ARCHIVO ? x.ID_ARCHIVO : null,
       x.CORREO,
+      Hasher.encode("1234567"),
       x.NOMBRES,
       x.PRIMER_APELLIDO,
       x.SEGUNDO_APELLIDO,
@@ -156,6 +168,4 @@ const remove = (id) => {
   });
 };
 
-const setFile = (id, file)=>{
-
-}
+const setFile = (id, file) => {};
