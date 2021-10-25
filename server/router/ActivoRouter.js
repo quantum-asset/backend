@@ -1,5 +1,5 @@
 import express from "express";
-import { ActivoController } from "../controller/ActivoController/ActivoController";
+import { ActivoController } from "../controller/ActivoController/ActivoController.js";
 
 const ActivoRouterRouter = express.Router();
 const controller = new ActivoController();

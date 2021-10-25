@@ -1,5 +1,5 @@
 import express from "express";
-import { TipoActivoController } from "../controller/TipoActivoController/TipoActivoController";
+import { TipoActivoController } from "../controller/TipoActivoController/TipoActivoController.js";
 const controller = new TipoActivoController();
 
 const TipoActivoRouter = express.Router();

@@ -1,5 +1,5 @@
 import express from "express";
-import { AreaResponsableController } from "../controller/AreaResponsableController/AreaResponsableController";
+import { AreaResponsableController } from "../controller/AreaResponsableController/AreaResponsableController.js";
 
 
 const AreaResponsableRouter = express.Router();

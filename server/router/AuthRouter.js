@@ -1,65 +1,50 @@
 import express from "express";
-import { newResponse } from "../response/Response.js";
-
+import { AuthController } from "../controller/AuthController/AuthController.js";
 
 const AuthRouter = express.Router();
-
+const controller = new AuthController();
 //AuthRouter = express.Router();
 
 //listar todo
-AuthRouter.post("/login",(req, res)=>{
-    const {CORREO, CONTRASENIA} = req.body;
-    if(!CORREO || !CONTRASENIA){
-        res.status(500).send(newResponse("error"));
-        return;
-    }
-
-    //buscar usuario con select y correo
-
-    //comparar password
-    //el user.passwors esta en hash
-    //hasheo lo que recibo CONTRASENIA y comparo strings
-    //si es igual retorno un ok, sino un error
-    // si es ok mando correo con codigo
-
-    //crear sesion y devolver tambien ese ID SESION para refrescar
+AuthRouter.get("", async (req, res) => {
+  res.send({ message: "Tenemos sus coordenadas de geolocalización" });
 });
 
-//insertar 1 o varios
-AuthRouter.post("/recuperar",(req, res)=>{
-    const {CORREO} = req.body;
-    if(!CORREO){
-        res.status(500).send(newResponse("error",{},"No ha ingresado un correo"));
-        return;
-    }
-
-    //buscar usuario con select y correo
-
-    // await enviar el correo, oajala sea sincrono
-
-    res.send(200).send(newResponse("ok",{},"Se envio un mensaje al correo indicado"));
-    
-
+/**
+ * iniciar sesion
+ * comprobar usuario y contraseña
+ * crear sesion
+ * retornar usuario y sesion en un solo objeto
+ */
+AuthRouter.post("/login", async (req, res) => {
+  const respuesta = await controller.login(req.body);
+  if (respuesta) {
+    res.status(200).send(respuesta);
+  } else {
+    res.status(500).send(Response.error("Ocurrió un error inesperado"));
+  }
 });
 
-AuthRouter.post("/recuperar/:codigo",(req, res)=>{
-    const {codigo} = req.params;
-    if(!codigo){
-        res.status(500).send(newResponse("error"),{},"No ha enviado el codigo");
-    }
-    const {CORREO, CONTRASENIA} = body;
-    //buscar usuario con select y correo
-
-    //comparar password
-    //el user.passwors esta en hash
-    //hasheo lo que recibo CONTRASENIA y comparo strings
-    //si es igual retorno un ok, sino un error
-    // si es ok mando correo con codigo
+/**
+ * Enviar la solicitud de recuperacion
+ * Solo recibe el correo y a esa direccion se le envia un codio y un link
+ */
+AuthRouter.post("/recover", async (req, res) => {
+  const respuesta = await controller.requestRecoverPassword(req.body.CORREO);
+  if (respuesta) {
+    res.status(200).send(respuesta);
+  } else {
+    res.status(500).send(Response.error("Ocurrió un error inesperado"));
+  }
 });
-
-///  SESIOM
-AuthRouter.put("/sesion/:id", async (req, res) => {
-  const { id } = req.params;
+//editar uno
+AuthRouter.post("/recover/:id", async (req, res) => {
+  const respuesta = await controller.recoverPassword(req.params.id);
+  if (respuesta) {
+    res.status(200).send(respuesta);
+  } else {
+    res.status(500).send(Response.error("Ocurrió un error inesperado"));
+  }
 });
 
 export { AuthRouter };

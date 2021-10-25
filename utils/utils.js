@@ -36,6 +36,7 @@ export class Hasher {
     Hasher.encode = encode;
     Hasher.compare = compare;
     Hasher.random = random;
+    Hasher.token = token;
   }
   /**
    * Codifica el mensaje en 128 caracteres
@@ -65,5 +66,8 @@ export class Hasher {
     const uuid = uuidv4();
     console.log(uuid);
     return Hasher.encode(uuid);
+  };
+  static token = () => {
+    return uuidv4();
   };
 }
