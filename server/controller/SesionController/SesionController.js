@@ -26,7 +26,7 @@ export class SesionController {
 const list = (filtros = { filtrosKeys: ["ESTADO"], filtrosValues: [1] }) => {
   return new Promise((resolve, reject) => {
     const conn = connectMysql;
-    console.log("Filtros:", makeFilterQuery(filtros));
+    //console.log("Filtros:", makeFilterQuery(filtros));
     const query = `SELECT * FROM SESION` + makeFilterQuery(filtros) + ";";
 
     conn.query(query, (err, result,fields) => {
@@ -64,7 +64,7 @@ const store = (sesiones) => {
       Hasher.token(),
       new Date(currentDate.getTime() + 5 * 60000),
     ]);
-    console.log("sesiones:", values);
+    //console.log("sesiones:", values);
     if (conn) {
       conn.query(query, [values], (err, result) => {
         if (err) {
