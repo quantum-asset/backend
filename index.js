@@ -16,6 +16,7 @@ import { ActivoRouterRouter } from "./server/router/ActivoRouter.js";
 import { AuthRouter } from "./server/router/AuthRouter.js";
 import ExpressServer from "./server/server.js";
 import { Scheduler } from "./utils/scheduler.js";
+import { SesionRouter } from "./server/router/SesionRouter.js";
 /*
 1) agregar auditoria en cada post, put y delete de los controllers
 */
@@ -66,6 +67,9 @@ app.use("/area-responsable", AreaResponsableRouter);
 
 app.use("/tipo-activo", TipoActivoRouter);
 app.use("/activo", ActivoRouterRouter);
+
+app.use("/sesion", SesionRouter);
+
 
 /*
 app.use("/necesidad-tag", NecesidadTagRouter);

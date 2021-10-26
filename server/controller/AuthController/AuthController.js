@@ -20,19 +20,34 @@ export class AuthController {
   }
 }
 const login = async ({ CORREO, CONTRASENIA }) => {
+  console.log("CORREO", CORREO);
+  console.log("CONTRASENIA", CONTRASENIA);
+
   return new Promise(async (resolve, reject) => {
     //select de usuario por correo
+    if (!CORREO || !CONTRASENIA) {
+      resolve(Response.error("No se ingreso el correo o contraseña"));
+    }
+    if (CORREO.length === 0 || CONTRASENIA.length === 0) {
+      resolve(
+        Response.error("El correo o contraseña debe tener longitud mayor a 6")
+      );
+    }
     const usuarios = await usuarioController.list({
-      filtrosKeys: ["CORREO"],
-      filtrosValues: [CORREO],
+      filtrosKeys: ["CORREO", "ESTADO"],
+      filtrosValues: [`'${CORREO}'`, 1],
     });
-    const usuario = usuarios[0];
-    const passwordFromDB = usuario.CONTRASENIA;
+
+    console.log("usuarios: ", usuarios);
 
     // hasheo el password del request
-    if (usuarios.length === 0) {
+    if (usuarios.payload.length === 0) {
       resolve(Response.error("El usuario o contraseña no coincide"));
     }
+
+    const usuario = usuarios.payload[0];
+    const passwordFromDB = usuario.CONTRASENIA;
+
     //comparo
     if (Hasher.compare(CONTRASENIA, passwordFromDB)) {
       //son iguales
@@ -40,9 +55,10 @@ const login = async ({ CORREO, CONTRASENIA }) => {
       const { payload } = sesionController.store([
         { ID_USUARIO: usuario.ID_USUARIO },
       ]);
+      console.log("SESION: ", payload);
       //retorno la sesion  con el token y al usuario
       resolve(
-        Response.ok("ok", { ...usuario, payload }, "Inicio de sesión correcto")
+        Response.ok("ok", { ...usuario, ...payload }, "Inicio de sesión correcto")
       );
     } else {
       resolve(Response.error("La contraseña no coincide"));

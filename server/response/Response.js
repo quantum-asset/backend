@@ -24,7 +24,7 @@ export class Response {
       timestamp: new Date(),
     };
   };
-  static error = (error = "Error en la operacion", payload = {}) => {
+  static error = (error = "Error en la operacion", payload = []) => {
     return {
       status: "error",
       payload,

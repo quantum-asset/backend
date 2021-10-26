@@ -29,11 +29,12 @@ const list = (filtros = { filtrosKeys: ["ESTADO"], filtrosValues: [1] }) => {
     console.log("Filtros:", makeFilterQuery(filtros));
     const query = `SELECT * FROM SESION` + makeFilterQuery(filtros) + ";";
 
-    conn.query(query, (err, result) => {
+    conn.query(query, (err, result,fields) => {
       if (err) {
         resolve(Response.error("Error al listar sesiones"));
       } else {
-        console.log(result);
+        //console.log("result",result);
+        //console.log("fields",fields);
         resolve(
           Response.ok(
             "success",

@@ -7,7 +7,6 @@ export class Scheduler {
     this.sleep = sleep;
     this.checkExpiredSesion = checkExpiredSesion;
     this.refreshCodigosRecuperacion = refreshCodigosRecuperacion;
-    
   }
   static futureDate = (mins = 24 * 60) => {
     const oldDateObj = new Date();
@@ -23,13 +22,17 @@ export class Scheduler {
  * 5000 milisegundos
  * @param {*} time
  */
-const checkExpiredSesion = async (time = 5000) => {
+const checkExpiredSesion = async (time = 15000) => {
   while (true) {
     await sleep(time);
+    console.log("checkExpiredSesion");
+
     // get list of active sessions
     const listOfSesions = await sesionController.list();
-    for (let i = 0; i < listOfSesions.length; i++) {
-      const currentSesion = listOfSesions[i];
+    const sesionesSinRowDataPacket = JSON.parse(JSON.stringify(listOfSesions)).payload;
+    console.log("sesionesSinRowDataPacket", sesionesSinRowDataPacket);
+    for (let i = 0; i < sesionesSinRowDataPacket.length; i++) {
+      const currentSesion = sesionesSinRowDataPacket[i];
       const currentSesionDate = new Date(currentSesion.EXPIRACION);
       const currentDateNow = new Date();
       //debo parsear este string
@@ -43,9 +46,10 @@ const checkExpiredSesion = async (time = 5000) => {
   }
 };
 
-const refreshCodigosRecuperacion = async (time = 5000) => {
+const refreshCodigosRecuperacion = async (time = 15000) => {
   while (true) {
     await sleep(time);
+    console.log("refreshCodigosRecuperacion");
     // get list of active sessions
     const listOfUsersAndCodes = RecoverPassword.usuarios;
     for (let i = 0; i < listOfUsersAndCodes.length; i++) {

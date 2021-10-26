@@ -17,6 +17,9 @@ AuthRouter.get("", async (req, res) => {
  * retornar usuario y sesion en un solo objeto
  */
 AuthRouter.post("/login", async (req, res) => {
+  console.log("body", req.body);
+  console.log("params", req.params);
+  console.log("query", req.query);
   const respuesta = await controller.login(req.body);
   if (respuesta) {
     res.status(200).send(respuesta);

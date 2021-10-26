@@ -26,13 +26,15 @@ export class UsuarioController {
 }
 
 //los filtros tipo string ya deben tener las comillas simples
-const list = (filtros = { filtrosKeys: [], filtrosValues: [] }) => {
+const list = (filtros = { filtrosKeys: ["ESTADO"], filtrosValues: [1] }) => {
+  console.log("filtros:", filtros);
   return new Promise((resolve, reject) => {
     const conn = connectMysql;
     const query = `SELECT * FROM USUARIO` + makeFilterQuery(filtros) + ";";
     if (conn) {
       conn.query(query, (err, result) => {
         if (err) {
+          console.log("error al listar usuarios:", err);
           resolve(Response.error("Error al listar usuarios"));
         } else {
           console.log(result);
