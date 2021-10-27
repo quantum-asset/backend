@@ -1,5 +1,6 @@
 import express from "express";
 import mysql from "mysql";
+import { verifyToken } from "../Authentication/verifyToken.js";
 import { LocacionController } from "../controller/LocacionController/LocacionController.js";
 import { Response } from "../response/Response.js";
 
@@ -8,7 +9,7 @@ const controller = new LocacionController();
 //LocacionRouter = express.Router();
 
 //listar todo
-LocacionRouter.get("", async (req, res) => {
+LocacionRouter.get("", verifyToken, async (req, res) => {
   const q = req.query;
   const respuesta = await controller.list({
     filtrosKeys: Object.keys(q),
@@ -18,7 +19,7 @@ LocacionRouter.get("", async (req, res) => {
 });
 
 //insertar 1 o varios
-LocacionRouter.post("", async (req, res) => {
+LocacionRouter.post("", verifyToken, async (req, res) => {
   //must be an array
   const respuesta = await controller.store(req.body);
   if (respuesta) {
@@ -29,7 +30,7 @@ LocacionRouter.post("", async (req, res) => {
 });
 
 //editar uno
-LocacionRouter.put("/:id", async (req, res) => {
+LocacionRouter.put("/:id", verifyToken, async (req, res) => {
   const respuesta = await controller.edit(req.params.id, req.body);
 
   if (respuesta) {
@@ -40,7 +41,7 @@ LocacionRouter.put("/:id", async (req, res) => {
 });
 
 //eliminar 1
-LocacionRouter.delete("", async (req, res) => {
+LocacionRouter.delete("", verifyToken, async (req, res) => {
   const respuesta = await controller.remove(req.query.id);
   if (respuesta) {
     res.status(200).send(respuesta);

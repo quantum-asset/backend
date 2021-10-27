@@ -1,11 +1,12 @@
 import express from "express";
 import mysql from "mysql";
+import { verifyToken } from "../Authentication/verifyToken.js";
 import { TipoLocacionController } from "../controller/TipoLocacionController/TipoLocacionController.js";
 import { newResponse } from "../response/Response.js";
 const TipoLocacionRouter = express.Router();
 const controller = new TipoLocacionController();
 //listar todo
-TipoLocacionRouter.get("", async (req, res) => {
+TipoLocacionRouter.get("",verifyToken, async (req, res) => {
   const q = req.query;
   console.log("query", q);
   const respuesta = await controller.list({
@@ -23,7 +24,7 @@ TipoLocacionRouter.get("", async (req, res) => {
 });
 
 //insertar 1 o varios
-TipoLocacionRouter.post("", async (req, res) => {
+TipoLocacionRouter.post("",verifyToken, async (req, res) => {
   const respuesta = await controller.store(req.body);
   if (respuesta) {
     res.status(200).send(respuesta);
@@ -35,7 +36,7 @@ TipoLocacionRouter.post("", async (req, res) => {
 });
 
 //editar locacion
-TipoLocacionRouter.put("/:id", async (req, res) => {
+TipoLocacionRouter.put("/:id",verifyToken, async (req, res) => {
   // const controller = new TipoLocacionController();
   const respuesta = await controller.edit(req.params.id, req.body);
 
@@ -48,7 +49,7 @@ TipoLocacionRouter.put("/:id", async (req, res) => {
   }
 });
 //eliminar locacion
-TipoLocacionRouter.delete("/", async (req, res) => {
+TipoLocacionRouter.delete("/",verifyToken, async (req, res) => {
   const respuesta = await controller.remove(req.query.id);
   if (respuesta) {
     res.status(200).send(respuesta);
