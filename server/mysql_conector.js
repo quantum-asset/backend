@@ -4,14 +4,17 @@ import dotenv from "dotenv";
 
 dotenv.config();
 const superSQL = "";
+const isProduction = true;
 
 export const MYSQLCONFIG = {
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
+  host: isProduction ? process.env.DB_HOST_PROD : process.env.DB_HOST,
+  user: isProduction ? process.env.DB_USER_PROD : process.env.DB_USER,
+  password: isProduction
+    ? process.env.DB_PASSWORD_PROD
+    : process.env.DB_PASSWORD,
+  database: isProduction ? process.env.DB_NAME_PROD : process.env.DB_NAME,
 };
-
+console.log("MYSQLCONFIG", MYSQLCONFIG);
 /* const conectar = () => {
   conector.connect((err) => {
     if (err) {
