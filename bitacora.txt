@@ -1,0 +1,4 @@
+Cambiar puerto a "8028"
+
+Cambiar ubicacion del archivo.env hacia "/" por defecto, caso contrario esepcificar o usar __dirname
+
