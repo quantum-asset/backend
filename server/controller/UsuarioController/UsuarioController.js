@@ -1,3 +1,4 @@
+import { Mailer } from "../../../utils/mailer.js";
 import { Hasher } from "../../../utils/utils.js";
 import { connectMysql } from "../../mysql_conector.js";
 import { Response } from "../../response/Response.js";
@@ -31,6 +32,8 @@ const list = (filtros = { filtrosKeys: ["ESTADO"], filtrosValues: [1] }) => {
   return new Promise((resolve, reject) => {
     const conn = connectMysql;
     const query = `SELECT * FROM USUARIO` + makeFilterQuery(filtros) + ";";
+    console.log("query:", query);
+
     if (conn) {
       conn.query(query, (err, result) => {
         if (err) {
@@ -74,14 +77,19 @@ const store = (usuario) => {
       new Date(),
       new Date(),
     ]);
+
     console.log("USUARIOS:", values);
     if (conn) {
-      conn.query(query, [values], (err, result) => {
+      conn.query(query, [values], async(err, result) => {
         if (err) {
           console.log("Error al insertar usuario", err);
           resolve(Response.error("Error al insertar usuario"));
         } else {
           console.log(result);
+          for (let i = 0; i < values.length; i++) {
+            const current = values[i];
+            await Mailer.sendRegisterConfirmation(current[3], current[4]);
+          }
           resolve(
             Response.ok(
               "success",

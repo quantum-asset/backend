@@ -9,8 +9,10 @@ import { Hasher } from "../../../utils/utils.js";
 import { SesionController } from "../SesionController/SesionController.js";
 import { Mailer } from "../../../utils/mailer.js";
 import { RecoverPassword } from "../../../utils/RecoverPassword/RecoverPassword.js";
+import { RolController } from "../RolController/RolController.js";
 const usuarioController = new UsuarioController();
 const sesionController = new SesionController();
+const rolController = new RolController();
 export class AuthController {
   constructor() {
     this.login = login;
@@ -51,14 +53,29 @@ const login = async ({ CORREO, CONTRASENIA }) => {
     //comparo
     if (Hasher.compare(CONTRASENIA, passwordFromDB)) {
       //son iguales
-      //creo una sesion
-      const { payload } = sesionController.store([
+      //reviso si ya tiene una sesión activa,
+      //futuro XD
+
+      //sino, le creo una sesion
+      const SESION = await sesionController.store([
         { ID_USUARIO: usuario.ID_USUARIO },
       ]);
-      console.log("SESION: ", payload);
+      console.log("SESION: ", SESION);
+
+      const ROL = await rolController.list({
+        filtrosKeys: ["ID_ROL"],
+        filtrosValues: [usuario.ID_ROL],
+      });
+      //Busco su rol y permisos
+      console.log("ROL: ", ROL);
+
       //retorno la sesion  con el token y al usuario
       resolve(
-        Response.ok("ok", { ...usuario, ...payload }, "Inicio de sesión correcto")
+        Response.ok(
+          "ok",
+          { ...usuario, sesion: SESION.payload, rol: ROL.payload },
+          "Inicio de sesión correcto"
+        )
       );
     } else {
       resolve(Response.error("La contraseña no coincide"));
@@ -72,17 +89,18 @@ const login = async ({ CORREO, CONTRASENIA }) => {
  * @returns
  */
 const requestRecoverPassword = async (CORREO) => {
+  console.log("Request:", CORREO);
   return new Promise(async (resolve, reject) => {
     //select de usuario por correo
     const usuarios = await usuarioController.list({
       filtrosKeys: ["CORREO"],
-      filtrosValues: [CORREO],
+      filtrosValues: [`"${CORREO}"`],
     });
     if (usuarios.length > 0) {
       const codigoRecuperacion = Hasher.random();
       //enviar por correo
       const response = Mailer.sendRecoveryCode(CORREO, codigoRecuperacion);
-
+      
       if (response) {
         //no es falso, osea ok
         //si se envio bien lo guardo en memoria

@@ -58,24 +58,26 @@ const store = (sesiones) => {
     //add timestamps
     const conn = connectMysql;
     const currentDate = new Date();
+    const newToken =  Hasher.token();
     const query = `INSERT INTO SESION (ID_USUARIO,TOKEN,EXPIRACION) VALUES ?`;
     const values = sesiones.map((x) => [
       x.ID_USUARIO,
-      Hasher.token(),
+      newToken,
       new Date(currentDate.getTime() + 5 * 60000),
     ]);
     //console.log("sesiones:", values);
     if (conn) {
-      conn.query(query, [values], (err, result) => {
+      conn.query(query, [values], (err, result,fields) => {
+       
         if (err) {
           console.log("Error al insertar SESION", err);
           resolve(Response.error("Error al insertar locacion"));
         } else {
-          console.log(result);
+          //console.log(result);
           resolve(
             Response.ok(
               "success",
-              result,
+              {},
               "Se registraron los sesiones correctamente"
             )
           );
@@ -114,7 +116,7 @@ const edit = (id, SESION) => {
             Response.ok(
               "success",
               result,
-              "Se registró el SESION correctamente"
+              "Se editó el SESION correctamente"
             )
           );
         }
