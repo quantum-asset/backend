@@ -77,6 +77,8 @@ export class Mailer {
               console.log("error", error);
               resolve(false);
             } else {
+              console.log("sendRecoveryCode: ", codigoRecuperacion);
+
               resolve(info);
             }
           });

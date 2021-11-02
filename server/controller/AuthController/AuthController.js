@@ -19,6 +19,7 @@ export class AuthController {
     this.requestRecoverPassword = requestRecoverPassword;
     this.recoverPassword = recoverPassword;
     this.refreshSesion = refreshSesion;
+    this.checkCode = checkCode;
   }
 }
 const login = async ({ CORREO, CONTRASENIA }) => {
@@ -92,19 +93,28 @@ const requestRecoverPassword = async (CORREO) => {
   console.log("Request:", CORREO);
   return new Promise(async (resolve, reject) => {
     //select de usuario por correo
-    const usuarios = await usuarioController.list({
+    const usuariosPre = await usuarioController.list({
       filtrosKeys: ["CORREO"],
       filtrosValues: [`"${CORREO}"`],
     });
+    const usuarios = JSON.parse(JSON.stringify(usuariosPre)).payload;
+    console.log("usuariossssss", usuarios.payload);
     if (usuarios.length > 0) {
       const codigoRecuperacion = Hasher.random();
       //enviar por correo
-      const response = Mailer.sendRecoveryCode(CORREO, codigoRecuperacion);
-      
+      const response = await Mailer.sendRecoveryCode(
+        CORREO,
+        codigoRecuperacion
+      );
+      //console.log("resposneeee", response);
       if (response) {
         //no es falso, osea ok
         //si se envio bien lo guardo en memoria
-        const addedRecoveryClass = RecoverPassword.add(usuarios[0].ID_USUARIO);
+        const addedRecoveryClass = RecoverPassword.add(
+          usuarios[0].ID_USUARIO,
+          codigoRecuperacion
+        );
+
         if (!addedRecoveryClass) {
           resolve(
             Response.error(
@@ -112,11 +122,14 @@ const requestRecoverPassword = async (CORREO) => {
             )
           );
         }
+        //en caso se haya enviado
+
         resolve(
           Response.ok(
             "ok",
             {},
-            "Si el correo ingresado está registrado se enviarán instrucciones de recuperación"
+            "Se ha enviado instrucciones para reestablecer su contraseña a " +
+              CORREO
           )
         );
       } else {
@@ -126,18 +139,33 @@ const requestRecoverPassword = async (CORREO) => {
           )
         );
       }
+    } else {
+      console.log("Nose encontro usuario");
+      resolve(
+        Response.ok(
+          "error",
+          {},
+          "El coreo ingresado no se encuentra registrado en nuestra base de datos"
+        )
+      );
     }
-    resolve(
-      Response.ok(
-        "ok",
-        {},
-        "Si el correo ingresado está registrado se enviarán instrucciones de recuperación"
-      )
-    );
   });
 };
-
-const recoverPassword = (codigoRecuperacion) => {
+const checkCode = async (codigoRecuperacion) => {
+  return new Promise(async (resolve, reject) => {
+    const idIfValid= RecoverPassword.isValidCode(codigoRecuperacion);
+    if (idIfValid) {
+      resolve(Response.ok("ok", {ID:idIfValid}, "Codigo correcto y existente"));
+    } else {
+      resolve(
+        Response.error(
+          "Codigo incorrecto o expirado, por favor vuelva a solicitar reestablecimiento de contraseña"
+        )
+      );
+    }
+  });
+};
+const recoverPassword = async (codigoRecuperacion) => {
   return new Promise(async (resolve, reject) => {
     //select de usuario por correo
     const usuario = await usuarioController.list({

@@ -103,7 +103,7 @@ app.post("/", (req, res) => {
   console.log("body", input);
   console.log("headers", req.headers);
   console.log("params", req.params);
-  res.status(200).send({ youSent: input });
+  res.status(200).send({ youSent: {...req} });
 });
 
 app.listen(port, () => {

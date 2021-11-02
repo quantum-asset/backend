@@ -80,7 +80,7 @@ const store = (usuario) => {
 
     console.log("USUARIOS:", values);
     if (conn) {
-      conn.query(query, [values], async(err, result) => {
+      conn.query(query, [values], async (err, result) => {
         if (err) {
           console.log("Error al insertar usuario", err);
           resolve(Response.error("Error al insertar usuario"));
@@ -116,13 +116,18 @@ const edit = (id, usuario) => {
     const conn = connectMysql;
     //add timestamps
     const ULTIMA_MODIFICACION = new Date();
-    const usuarioKeys = [...Object.keys(usuario), "ULTIMA_MODIFICACION"];
-    const usuarioValues = [
+    let usuarioKeys = [...Object.keys(usuario), "ULTIMA_MODIFICACION"];
+    let usuarioValues = [
       ...Object.values(usuario),
       ULTIMA_MODIFICACION,
       ID_USUARIO,
     ];
-
+    // check if contrasenia is being changed
+    for (let i = 0; i < usuarioKeys.length; i++) {
+      if (usuarioKeys[i] === "CONTRASENIA") {
+        usuarioValues[i] = Hasher.encode(usuarioValues[i]);
+      }
+    }
     const query = `UPDATE USUARIO SET ${makeUpdateQuery(
       usuarioKeys
     )}  WHERE ID_USUARIO = ?`;

@@ -34,16 +34,41 @@ AuthRouter.post("/login", async (req, res) => {
  */
 AuthRouter.post("/recover", async (req, res) => {
   const respuesta = await controller.requestRecoverPassword(req.body.CORREO);
+  /*  const { CODIGO } = req.body;
+ console.log("CODE /recover=>", CODIGO);
+ const respuesta = { snet: CODIGO }; */
   if (respuesta) {
     res.status(200).send(respuesta);
   } else {
     res.status(500).send(Response.error("Ocurrió un error inesperado"));
   }
 });
+
+/**
+ * Verificar si el codigo existe y es correcto
+ */
+AuthRouter.post("/recover/check", async (req, res) => {
+  /* const { CODIGO } = req.body;
+  console.log("CODE check =>", CODIGO);
+  const respuesta = { snet: CODIGO };
+   */
+  const respuesta = await controller.checkCode(req.body.CODIGO);
+
+  if (respuesta) {
+    res.status(200).send(respuesta);
+  } else {
+    res.status(500).send(Response.error("Ocurrió un error inesperado"));
+  }
+});
+
 //editar uno
 AuthRouter.post("/recover/:id", async (req, res) => {
-  const respuesta = await controller.recoverPassword(req.params.id);
+  //const respuesta = await controller.recoverPassword(req.params.id);
+  const { CODIGO } = req.body;
+  console.log("CODE :id=>", CODIGO);
+  const respuesta = { snet: CODIGO };
   if (respuesta) {
+    //res.status(200).send(respuesta);
     res.status(200).send(respuesta);
   } else {
     res.status(500).send(Response.error("Ocurrió un error inesperado"));

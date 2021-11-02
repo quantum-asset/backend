@@ -62,6 +62,10 @@ export class Hasher {
     const messageHash = hasher.hex() + hasher.hex();
     return messageHash === hashedMessage;
   };
+  /**
+   * Genera un codigo random
+   * @returns 
+   */
   static random = () => {
     const uuid = uuidv4();
     console.log(uuid);
