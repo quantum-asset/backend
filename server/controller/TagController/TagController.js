@@ -41,7 +41,7 @@ const store = (tags) => {
     //add timestamps
     const conn = connectMysql;
 
-    const query = `INSERT INTO TAG (ID_LOCACION,ID_USUARIO,CODIGO,DENOMINACION,DESCRIPCION, FECHA_CREACION, ULTIMA_MODIFICACION) VALUES ?`;
+    const query = `INSERT INTO TAG (ID_LOCACION,ID_USUARIO,CODIGO, FECHA_CREACION, ULTIMA_MODIFICACION) VALUES ?`;
     const values = tags.map((x) => [
       x.ID_LOCACION,
       x.ID_USUARIO,
