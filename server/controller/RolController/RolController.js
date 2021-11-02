@@ -23,7 +23,7 @@ const list = (filtros = { filtrosKeys: [], filtrosValues: [] }) => {
         } else {
           console.log(result);
           resolve(
-            Response.ok("success", result, "Se listaron los rol correctamente")
+            Response.ok("success", result, "Se listaron los roles correctamente")
           );
         }
       });
