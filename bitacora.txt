@@ -2,3 +2,6 @@ Cambiar puerto a "8028"
 
 Cambiar ubicacion del archivo.env hacia "/" por defecto, caso contrario esepcificar o usar __dirname
 
+el git pull no actualiza hasta hacer sudo kil pid_node
+
+y solito se actualiza
