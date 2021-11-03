@@ -54,7 +54,7 @@ const store = (tags) => {
       conn.query(query, [values], (err, result) => {
         if (err) {
           console.log("Error al insertar tag", err);
-          resolve(Response.error("Error al insertar locacion"));
+          resolve(Response.error("Error al insertar tags"));
         } else {
           console.log(result);
           resolve(

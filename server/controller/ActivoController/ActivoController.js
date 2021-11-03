@@ -50,7 +50,7 @@ const store = (activo) => {
       ID_TAG,
       ID_TIPO_ACTIVO,
       ID_LOCACION,
-      ID_AREA_REPONSABLE, 
+      ID_AREA_RESPONSABLE, 
       ID_ARCHIVO, 
       DENOMINACION,
       CARACTERISTICAS,
