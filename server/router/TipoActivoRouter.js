@@ -8,8 +8,11 @@ const TipoActivoRouter = express.Router();
 
 //listar todo
 TipoActivoRouter.get("", async (req, res) => {
-  const respuesta = await controller.list();
-
+  const q = req.query;
+  const respuesta = await controller.list({
+    filtrosKeys: Object.keys(q),
+    filtrosValues: Object.values(q),
+  });
   if (respuesta) {
     res.status(200).send(respuesta);
   } else {
