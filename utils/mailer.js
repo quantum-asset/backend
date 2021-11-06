@@ -132,6 +132,51 @@ export class Mailer {
     }
   };
 
+  /**
+   * CORREO DE CONFIRMACION DE ASIGNACION E TOMA DE INVETARIO
+   **/
+  /**
+   * Diferente de falso significa que se envió el correo
+   * @param {*} correo
+   * @param {*} codigoRecuperacion
+   * @returns
+   */
+   static sendAssignamentTomaInventario = async(correo, locaciones=[]) => {
+    if (!correo || locaciones===[]) {
+      return false;
+    } else {
+      return new Promise((resolve, reject) => {
+        try {
+          const transporter = nodemailer.createTransport(Mailer.config);
+          //console.log("OPTIONS:", Mailer.config);
+          const mailOptions = {
+            from: '"Obito Uchiha" <quantum.asset.mailer@gmail.com>"',
+            to: correo,
+            subject: "Registro de nuevo usuario QUANTUM ASSET", // Subject line
+            text: `Estimado usuario,
+            Se ha creado correctamente una cuenta en Quantum Asset.
+            Su primera contraseña es: ${contrasenia}
+            Esta es una contraseña autogenerada favor, no olvide cambiarla.
+            `, // plain text body
+            // html: "<p>Estimado usuario, se ha registrado satisfactoriamente</p>", // html body
+          };
+          transporter.sendMail(mailOptions, function (error, info) {
+            if (error) {
+              console.log("error", error);
+              resolve(false);
+            } else {
+              resolve(info);
+            }
+          });
+        } catch (error) {
+          resolve(error);
+        }
+      });
+    }
+  };
+
+
+
   /*
    * CORREO CON EL CODIGO--------->  WWW.URL/recover/<codigo>
    *

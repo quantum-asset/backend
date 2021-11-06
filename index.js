@@ -18,6 +18,7 @@ import ExpressServer from "./server/server.js";
 import { Scheduler } from "./utils/scheduler.js";
 import { SesionRouter } from "./server/router/SesionRouter.js";
 import { NecesidadTagRouter } from "./server/router/NecesidadTagRouter.js";
+import { TomaInventarioRouter } from "./server/router/TomaInventarioRouter.js";
 /*
 1) agregar auditoria en cada post, put y delete de los controllers
 */
@@ -72,10 +73,11 @@ app.use("/activo", ActivoRouterRouter);
 app.use("/sesion", SesionRouter);
 
 app.use("/necesidad-tag", NecesidadTagRouter);
-/*
-app.use("/necesidad-tag", NecesidadTagRouter);
 
-app.use("/necesidad-tag", UsuarioRouter);
+app.use("/toma-inventario", TomaInventarioRouter);
+
+/*
+
 app.use("/transaccion", TransaccionRouter);
 
 app.use("/area-responsable", AreaResponsableRouter);
