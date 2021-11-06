@@ -33,15 +33,15 @@ const list = (filtros = { filtrosKeys: ["ESTADO"], filtrosValues: [1] }) => {
     if (conn) {
       conn.query(query, (err, result) => {
         if (err) {
-          console.log("error al listar usuarios:", err);
-          resolve(Response.error("Error al listar usuarios"));
+          console.log("error al listar Tomas de inventario:", err);
+          resolve(Response.error("Error al listar Tomas de inventario"));
         } else {
           console.log(result);
           resolve(
             Response.ok(
               "success",
               result,
-              "Se listaron los usuarios correctamente"
+              "Se listaron los Tomas de inventario correctamente"
             )
           );
         }
@@ -179,9 +179,9 @@ const addUsers = (insertIdTomaInventario,USUARIOS) => {
     //console.log("h256", sha256);
     const query = `INSERT INTO USUARIO_X_TOMA_INVENTARIO (ID_USUARIO,ID_TOMA_INVENTARIO) VALUES ?`;
 
-    const values = usuarioXTomaInventario.map((x) => [
+    const values = USUARIOS.map((x) => [
       x.ID_USUARIO,
-      x.ID_TOMA_INVENTARIO,
+      insertIdTomaInventario,
     ]);
 
     console.log("USUARIOS X TOMA_INVENTARIO:", values);
@@ -219,19 +219,19 @@ const addLocaciones = (insertIdTomaInventario,LOCACIONES) => {
     return new Promise(async (resolve, reject) => {
       const conn = connectMysql;
 
-      const query = `INSERT INTO TOMA_INVENTARIO_X_LOCACION (ID_USUARIO,ID_TOMA_INVENTARIO) VALUES ?`;
+      const query = `INSERT INTO TOMA_INVENTARIO_X_LOCACION (ID_TOMA_INVENTARIO,ID_LOCACION) VALUES ?`;
   
-      const values = usuarioXTomaInventario.map((x) => [
+      const values = LOCACIONES.map((x) => [
         insertIdTomaInventario,
         x.ID_LOCACION,
       ]);
   
-      console.log("USUARIOS X TOMA_INVENTARIO:", values);
+      console.log("LOCACIONES X TOMA_INVENTARIO:", values);
       if (conn) {
         conn.query(query, [values], async (err, result) => {
           if (err) {
-            console.log("Error al insertar usuarioXTomaInventario", err);
-            resolve(Response.error("Error al insertar usuarioXTomaInventario"));
+            console.log("Error al insertar locacionesXTomaInventario", err);
+            resolve(Response.error("Error al insertar locacionesXTomaInventario"));
           } else {
             console.log(result);
            /* 
@@ -245,7 +245,7 @@ const addLocaciones = (insertIdTomaInventario,LOCACIONES) => {
               Response.ok(
                 "success",
                 result,
-                "Se registró los usuarioXTomaInventario correctamente"
+                "Se registró los locacionesXTomaInventario correctamente"
               )
             );
           }

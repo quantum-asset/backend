@@ -1,5 +1,5 @@
 import express from "express";
-import { TomaInventarioController } from "../controller/TomaInventarioController/TomaInventarioController";
+import { TomaInventarioController } from "../controller/TomaInventarioController/TomaInventarioController.js";
 
 const TomaInventarioRouter = express.Router();
 const controller = new TomaInventarioController();
@@ -30,7 +30,7 @@ TomaInventarioRouter.post("", async (req, res) => {
       );
   } else {
     //le doy el objeto de toma de inventario
-    const respuestaTomaInventario = await controller.store(TOMA_INVENTARIO);
+    const respuestaTomaInventario = await controller.store([TOMA_INVENTARIO]);
 
     const { insertId, affectedRows } = respuestaTomaInventario.payload;
     console.log("Toma de inventario ID: ", insertId);
@@ -50,13 +50,11 @@ TomaInventarioRouter.post("", async (req, res) => {
         respuestaTomaInventarioUsuarios &&
         respuestaTomaInventarioLocaciones
       ) {
-        res
-          .status(200)
-          .send({
-            ...respuestaTomaInventario,
-            ...respuestaTomaInventarioUsuarios,
-            ...respuestaTomaInventarioLocaciones,
-          });
+        res.status(200).send({
+          responseInventario: respuestaTomaInventario,
+          responseUsuarios: respuestaTomaInventarioUsuarios,
+          responseInventarioLocaciones:respuestaTomaInventarioLocaciones,
+        });
       } else {
         //intente nuevamente
         res
@@ -77,12 +75,6 @@ TomaInventarioRouter.post("", async (req, res) => {
           )
         );
     }
-
-    if (respuesta) {
-      res.status(200).send(respuesta);
-    } else {
-      res.status(500).send(Response.error("Ocurrió un error inesperado"));
-    }
   }
 });
 
@@ -98,7 +90,7 @@ TomaInventarioRouter.put(":id", async (req, res) => {
 });
 
 //eliminar 1
-TomaInventarioRouter.delete(":id", (req, res) => {
+TomaInventarioRouter.delete(":id", async (req, res) => {
   const respuesta = await controller.remove(req.query.id);
   if (respuesta) {
     res.status(200).send(respuesta);
