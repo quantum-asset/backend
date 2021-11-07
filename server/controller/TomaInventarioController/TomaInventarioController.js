@@ -35,7 +35,7 @@ export class TomaInventarioController {
 const list = (
   //filtros = { filtrosKeys: ["ESTADO"], filtrosValues: [1] }
   filtros = { filtrosKeys: [], filtrosValues: [] },
-  joins = []
+
 ) => {
   console.log("filtros:", filtros);
   return new Promise((resolve, reject) => {
