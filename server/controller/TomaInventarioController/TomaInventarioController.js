@@ -13,16 +13,30 @@ export class TomaInventarioController {
     this.store = store;
     this.edit = edit;
     this.remove = remove;
+
     // USUARIO X TOMA INVENTARIO
     this.addUsers = addUsers;
-    this.addLocaciones=addLocaciones;
+    this.listUsers = listUsers;
+
+    // LOCACION X TOMA INVENTARIO
+    this.addLocaciones = addLocaciones;
+    this.listLocaciones = listLocaciones;
+
+    // TOMA INVENTARIO X LOCACION x ACTIVO
+    //this.listActivoXTomaInventarioXLcacion=listActivoXTomaInventarioXLcacion;
+    //this.addActivoXTomaInventarioXLcacion=addActivoXTomaInventarioXLcacion;
+
     ////////////////////////////
     this.setFile = setFile;
   }
 }
 
 //los filtros tipo string ya deben tener las comillas simples
-const list = (filtros = { filtrosKeys: ["ESTADO"], filtrosValues: [1] }) => {
+const list = (
+  //filtros = { filtrosKeys: ["ESTADO"], filtrosValues: [1] }
+  filtros = { filtrosKeys: [], filtrosValues: [] },
+  joins = []
+) => {
   console.log("filtros:", filtros);
   return new Promise((resolve, reject) => {
     const conn = connectMysql;
@@ -77,7 +91,7 @@ const store = (tomaInvenario) => {
           console.log("Error al insertar usuario", err);
           resolve(Response.error("Error al insertar usuario"));
         } else {
-            //EN PAYLOAD ESTA EL insertId
+          //EN PAYLOAD ESTA EL insertId
           resolve(
             Response.ok(
               "success",
@@ -171,7 +185,7 @@ const remove = (id) => {
   });
 };
 
-const addUsers = (insertIdTomaInventario,USUARIOS) => {
+const addUsers = (insertIdTomaInventario, USUARIOS) => {
   return new Promise(async (resolve, reject) => {
     const conn = connectMysql;
     //add timestamps
@@ -179,10 +193,7 @@ const addUsers = (insertIdTomaInventario,USUARIOS) => {
     //console.log("h256", sha256);
     const query = `INSERT INTO USUARIO_X_TOMA_INVENTARIO (ID_USUARIO,ID_TOMA_INVENTARIO) VALUES ?`;
 
-    const values = USUARIOS.map((x) => [
-      x.ID_USUARIO,
-      insertIdTomaInventario,
-    ]);
+    const values = USUARIOS.map((x) => [x.ID_USUARIO, insertIdTomaInventario]);
 
     console.log("USUARIOS X TOMA_INVENTARIO:", values);
     if (conn) {
@@ -192,7 +203,7 @@ const addUsers = (insertIdTomaInventario,USUARIOS) => {
           resolve(Response.error("Error al insertar usuarioXTomaInventario"));
         } else {
           console.log(result);
-         /* 
+          /* 
          
          BUSCAR USUARIO POR ID Y SACAR SU CORREO, TAMBIEN SACAR
          for (let i = 0; i < values.length; i++) {
@@ -215,44 +226,116 @@ const addUsers = (insertIdTomaInventario,USUARIOS) => {
 };
 
 ///locaciones
-const addLocaciones = (insertIdTomaInventario,LOCACIONES) => {
-    return new Promise(async (resolve, reject) => {
-      const conn = connectMysql;
+const addLocaciones = (insertIdTomaInventario, LOCACIONES) => {
+  return new Promise(async (resolve, reject) => {
+    const conn = connectMysql;
 
-      const query = `INSERT INTO TOMA_INVENTARIO_X_LOCACION (ID_TOMA_INVENTARIO,ID_LOCACION) VALUES ?`;
-  
-      const values = LOCACIONES.map((x) => [
-        insertIdTomaInventario,
-        x.ID_LOCACION,
-      ]);
-  
-      console.log("LOCACIONES X TOMA_INVENTARIO:", values);
-      if (conn) {
-        conn.query(query, [values], async (err, result) => {
-          if (err) {
-            console.log("Error al insertar locacionesXTomaInventario", err);
-            resolve(Response.error("Error al insertar locacionesXTomaInventario"));
-          } else {
-            console.log(result);
-           /* 
+    const query = `INSERT INTO TOMA_INVENTARIO_X_LOCACION (ID_TOMA_INVENTARIO,ID_LOCACION) VALUES ?`;
+
+    const values = LOCACIONES.map((x) => [
+      insertIdTomaInventario,
+      x.ID_LOCACION,
+    ]);
+
+    console.log("LOCACIONES X TOMA_INVENTARIO:", values);
+    if (conn) {
+      conn.query(query, [values], async (err, result) => {
+        if (err) {
+          console.log("Error al insertar locacionesXTomaInventario", err);
+          resolve(
+            Response.error("Error al insertar locacionesXTomaInventario")
+          );
+        } else {
+          console.log(result);
+          /* 
            
            BUSCAR USUARIO POR ID Y SACAR SU CORREO, TAMBIEN SACAR
            for (let i = 0; i < values.length; i++) {
               const current = values[i];
               await Mailer.sendRegisterConfirmation(current[3]);
             } */
-            resolve(
-              Response.ok(
-                "success",
-                result,
-                "Se registró los locacionesXTomaInventario correctamente"
-              )
-            );
-          }
-        });
-      } else {
-        resolve(Response.error("Error al conectar con la base de datos"));
-      }
-    });
-  };
+          resolve(
+            Response.ok(
+              "success",
+              result,
+              "Se registró los locacionesXTomaInventario correctamente"
+            )
+          );
+        }
+      });
+    } else {
+      resolve(Response.error("Error al conectar con la base de datos"));
+    }
+  });
+};
 const setFile = (id, file) => {};
+/////////////////////////////////
+//////                   LISTAR TOMA INVENTARIO X USUARIOS
+///////////////////////////////////
+
+const listUsers = (filtros = { filtrosKeys: [], filtrosValues: [] }) => {
+  console.log("filtros:", filtros);
+  return new Promise((resolve, reject) => {
+    const conn = connectMysql;
+    const query =
+      `SELECT * FROM USUARIO_X_TOMA_INVENTARIO join USUARIO on USUARIO.ID_USUARIO = USUARIO_X_TOMA_INVENTARIO.ID_USUARIO` +
+      makeFilterQuery(filtros) +
+      ";";
+    ///////////////////////
+console.log("query ", query);
+    if (conn) {
+      conn.query(query, (err, result) => {
+        if (err) {
+          console.log("error al listar Tomas de inventario x usuarios:", err);
+          resolve(Response.error("Error al listar Tomas de inventario"));
+        } else {
+          console.log(result);
+          resolve(
+            Response.ok(
+              "success",
+              result,
+              "Se listaron los Tomas de inventario x usuarios correctamente"
+            )
+          );
+        }
+      });
+    } else {
+      resolve(Response.error("Error al conectar con la base de datos"));
+    }
+  });
+};
+
+/////////////////////////////////
+//////                   LISTAR TOMA INVENTARIO X LOCACIONES
+///////////////////////////////////
+const listLocaciones = (filtros = { filtrosKeys: [], filtrosValues: [] }) => {
+  console.log("filtros:", filtros);
+  return new Promise((resolve, reject) => {
+    const conn = connectMysql;
+    const query =
+      `SELECT * FROM TOMA_INVENTARIO_X_LOCACION join LOCACION on LOCACION.ID_LOCACION = TOMA_INVENTARIO_X_LOCACION.ID_LOCACION` +
+      makeFilterQuery(filtros) +
+      ";";
+    ///////////////////////
+
+    if (conn) {
+      conn.query(query, (err, result) => {
+        if (err) {
+          console.log("error al listar Tomas de inventario x locacion:", err);
+          resolve(Response.error("Error al listar Tomas de inventario"));
+        } else {
+          console.log(result);
+          resolve(
+            Response.ok(
+              "success",
+              result,
+              "Se listaron los Tomas de inventario x locacion correctamente"
+            )
+          );
+        }
+      });
+    } else {
+      resolve(Response.error("Error al conectar con la base de datos"));
+    }
+  });
+};
