@@ -21,15 +21,16 @@ const list = (filtros = { filtrosKeys: [], filtrosValues: [] }) => {
   return new Promise((resolve, reject) => {
     const conn = connectMysql;
     const query =
-      `SELECT * FROM ACTIVO` +
-      makeFilterQuery(filtros) +
-      "JOIN TAG ON TAG.ID_TAG = ACTIVO.ID_TAG;";
+      `SELECT * FROM ACTIVO as A JOIN TAG as T ON A.ID_TAG=T.ID_TAG` +
+      makeFilterQuery(filtros,"A") +
+      ";";
+    console.log("query ", query);
     if (conn) {
       conn.query(query, (err, result) => {
         if (err) {
           resolve(Response.error("Error al listar activos"));
         } else {
-          console.log(result);
+          //console.log(result);
           resolve(
             Response.ok(
               "success",
