@@ -8,6 +8,7 @@ const controller = new TomaInventarioController();
 
 //listar todas las tomas de inventario
 //mejora, con usuarios y locaciones
+//y ademas querys en la tabla  TOMA_INVENTARIO
 TomaInventarioRouter.get("", async (req, res) => {
   /*   const q = req.query;
   const respuesta = await controller.list({
@@ -28,15 +29,18 @@ TomaInventarioRouter.get("", async (req, res) => {
   if (tomasDeInventario && tomasDeInventario.length > 0) {
     for (let i = 0; i < tomasDeInventario.length; i++) {
       const currentTomaInventario = tomasDeInventario[i];
+      //listo las locaciones de esta toma de inventario
       const listaTomasInventarioLocaciones = await controller.listLocaciones({
         filtrosKeys: ["ID_TOMA_INVENTARIO"],
         filtrosValues: [currentTomaInventario.ID_TOMA_INVENTARIO],
       });
-
+      //listo los usuarios asociados, los activos no, porque podrian
+      //agregarse activos a la locacion antes de la realizacion de la toma de inventario
       const listaTomasInventarioUsuarios = await controller.listUsers({
         filtrosKeys: ["ID_TOMA_INVENTARIO"],
         filtrosValues: [currentTomaInventario.ID_TOMA_INVENTARIO],
       });
+      //retorno el objeto completo
       responseTomaInventario.push({
         TOMA_INVENTARIO: currentTomaInventario,
         LOCACIONES: listaTomasInventarioLocaciones.payload,
@@ -140,7 +144,7 @@ TomaInventarioRouter.post("", async (req, res) => {
 //                          USUARIO x TOMA INVENTARIO
 ///////////////////////////////////////////////////////////////
 
-//asociar usuarios a una toma de inventario
+//listart tomas de inventario desde un ID_USUARIO
 TomaInventarioRouter.get("/usuario/:id", async (req, res) => {
   //array de usuarios para asociar a una toma de inventario
   const id = req.params.id;
@@ -152,7 +156,10 @@ TomaInventarioRouter.get("/usuario/:id", async (req, res) => {
     filtrosValues: [id],
   });
 
-  console.log("respuestaUsuarioXTomaInventario",respuestaUsuarioXTomaInventario);
+  console.log(
+    "respuestaUsuarioXTomaInventario",
+    respuestaUsuarioXTomaInventario
+  );
   const listaUsuariosXTomaInventario = JSON.parse(
     JSON.stringify(respuestaUsuarioXTomaInventario)
   ).payload;
@@ -236,30 +243,66 @@ TomaInventarioRouter.post("/locacion", (req, res) => {
 ///////////////////////////////////////////////////////////////
 
 // Registrar toma de inventario de un activo
-TomaInventarioRouter.post("/activo", (req, res) => {});
+TomaInventarioRouter.get("/activo", async (req, res) => {
+  try {
+    const { ID_LOCACION, ID_TOMA_INVENTARIO_X_LOCACION } = req.query;
+    const respuestaTomaInventarioXActivo =
+      await controller.listActivoXTomaInventarioXLcacion(
+        ID_LOCACION,
+        ID_TOMA_INVENTARIO_X_LOCACION
+      );
+    console.log("tomas de inv", respuestaTomaInventarioXActivo.payload);
+    res.status(200).send(respuestaTomaInventarioXActivo);
+  } catch (error) {
+    console.log("error", error);
+    res.status(500).send(Response.error("Ocurrió un error inesperado"));
+  }
+});
+/**
+ * req.body = [{ID_A,ID_TOMA_INV_LOC,ID_USUARIO},{},{},{},{}]
+ */
+TomaInventarioRouter.post("/activo", async (req, res) => {
+  try {
+    const respuestaTomaInventarioXActivo =
+      await controller.listActivoXTomaInventarioXLcacion(req.body);
+    res.status(200).send(respuestaTomaInventarioXActivo);
+  } catch (error) {
+    console.log("error", error);
+    res.status(500).send(Response.error("Ocurrió un error inesperado"));
+  }
+});
 
-TomaInventarioRouter.post("/activo/evidencia", (req, res) => {
+TomaInventarioRouter.post("/activo/evidencia", async(req, res) => {
   //insert into EVIDENCIA, con el id
   //guardar en EFS
   //insert into archivo
 });
 // Editar toma de inventario de un activo
-TomaInventarioRouter.put("/locaciones", (req, res) => {});
+TomaInventarioRouter.put("/locaciones/:idLocacion/:idTomaInventario", async(req, res) => {
+  try {
+    const respuesta = await controller.editLocacionXTomaInventario(req.params.idLocacion,req.params.idTomaInventario, req.body);
+    res.status(200).send(respuesta);
+  } catch (error) {
+    res.status(500).send(Response.error("Ocurrió un error inesperado"));
+  }
+});
 
 /////// CONTINUA GESTION TOMAS DE INVENTARIO
 // Procesar toma de inventario
-TomaInventarioRouter.put(":id", async (req, res) => {
-  const respuesta = await controller.edit(req.params.id, req.body);
-
-  if (respuesta) {
+//fecha fin automatica
+//obsevaciones
+//por procesar
+TomaInventarioRouter.put("/:id", async (req, res) => {
+  try {
+    const respuesta = await controller.edit(req.params.id, req.body);
     res.status(200).send(respuesta);
-  } else {
+  } catch (error) {
     res.status(500).send(Response.error("Ocurrió un error inesperado"));
   }
 });
 
 //eliminar 1
-TomaInventarioRouter.delete(":id", async (req, res) => {
+TomaInventarioRouter.delete("", async (req, res) => {
   const respuesta = await controller.remove(req.query.id);
   if (respuesta) {
     res.status(200).send(respuesta);

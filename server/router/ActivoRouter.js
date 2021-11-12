@@ -14,7 +14,13 @@ ActivoRouterRouter.get("", async (req, res) => {
   });
   res.status(200).send(respuesta);
 });
-
+//contar por ID_LOCACION
+ActivoRouterRouter.get("/cuenta/:ID_LOCACION", async (req, res) => {
+  const {ID_LOCACION} = req.params;
+  console.log("ID_LOCACION",ID_LOCACION);
+  const respuesta = await controller.counter(ID_LOCACION);
+  res.status(200).send(respuesta);
+});
 //insertar 1 o varios
 ActivoRouterRouter.post("", async (req, res) => {
   //must be an array

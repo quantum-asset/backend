@@ -21,21 +21,87 @@ export class TomaInventarioController {
     // LOCACION X TOMA INVENTARIO
     this.addLocaciones = addLocaciones;
     this.listLocaciones = listLocaciones;
-
+    this.editLocacionXTomaInventario = editLocacionXTomaInventario;
     // TOMA INVENTARIO X LOCACION x ACTIVO
-    //this.listActivoXTomaInventarioXLcacion=listActivoXTomaInventarioXLcacion;
-    //this.addActivoXTomaInventarioXLcacion=addActivoXTomaInventarioXLcacion;
+    this.listActivoXTomaInventarioXLcacion = listActivoXTomaInventarioXLcacion;
+    this.addActivoXTomaInventarioXLcacion = addActivoXTomaInventarioXLcacion;
 
     ////////////////////////////
     this.setFile = setFile;
   }
 }
 
+const listActivoXTomaInventarioXLcacion = (
+  ID_LOCACION,
+  ID_TOMA_INVENTARIO_X_LOCACION
+) => {
+  return new Promise((resolve, reject) => {
+    const conn = connectMysql;
+    const query = `SELECT * FROM ACTIVO as A join TOMA_INVENTARIO_X_LOCACION_X_ACTIVO as TILA on TILA.ID_ACTIVO = A.ID_ACTIVO where A.ID_LOCACION=${ID_LOCACION} and TILA.ID_TOMA_INVENTARIO_X_LOCACION=${ID_TOMA_INVENTARIO_X_LOCACION};`;
+    console.log("query:", query);
+
+    if (conn) {
+      conn.query(query, (err, result) => {
+        if (err) {
+          console.log("error al listar Tomas de inventario:", err);
+          resolve(Response.error("Error al listar Tomas de inventario"));
+        } else {
+          console.log(result);
+          resolve(
+            Response.ok(
+              "success",
+              result,
+              "Se listaron los Tomas de inventario correctamente"
+            )
+          );
+        }
+      });
+    } else {
+      resolve(Response.error("Error al conectar con la base de datos"));
+    }
+  });
+};
+const addActivoXTomaInventarioXLcacion = () => {
+  return new Promise(async (resolve, reject) => {
+    const conn = connectMysql;
+
+    const query = `INSERT INTO TOMA_INVENTARIO_X_LOCACION_X_ACTIVO (ID_TOMA_INVENTARIO_X_LOCACION, ID_ACTIVO, ID_USUARIO,FECHA,OBSERVACION,ENCONTRADO) VALUES ?`;
+    const FECHA_ACTUAL = new Date();
+    const values = tomaInvenario.map((x) => [
+      x.ID_TOMA_INVENTARIO_X_LOCACION,
+      x.ID_ACTIVO,
+      x.ID_USUARIO,
+      FECHA_ACTUAL,
+      x.OBSERVACION,
+      x.ENCONTRADO,
+    ]);
+
+    console.log("tomaInvenario x activos:", values);
+    if (conn) {
+      conn.query(query, [values], async (err, result) => {
+        if (err) {
+          console.log("Error al insertar activos toma inventario", err);
+          resolve(Response.error("Error al insertar usuario"));
+        } else {
+          //EN PAYLOAD ESTA EL insertId
+          resolve(
+            Response.ok(
+              "success",
+              result,
+              "Se registró los activos toma inventario correctamente"
+            )
+          );
+        }
+      });
+    } else {
+      resolve(Response.error("Error al conectar con la base de datos"));
+    }
+  });
+};
 //los filtros tipo string ya deben tener las comillas simples
 const list = (
   //filtros = { filtrosKeys: ["ESTADO"], filtrosValues: [1] }
-  filtros = { filtrosKeys: [], filtrosValues: [] },
-
+  filtros = { filtrosKeys: [], filtrosValues: [] }
 ) => {
   console.log("filtros:", filtros);
   return new Promise((resolve, reject) => {
@@ -106,43 +172,82 @@ const store = (tomaInvenario) => {
     }
   });
 };
-/**
- * Lo unico editable seria la expiracion, para ampliar
- * @param {*} id
- * @param {*} usuarioXpermiso
- * @returns
- */
-const edit = (id, usuario) => {
+
+const editLocacionXTomaInventario = (
+  ID_LOCACION,
+  ID_TOMA_INVENTARIO,
+  tomaINventario
+) => {
   return new Promise((resolve, reject) => {
-    const ID_USUARIO = id;
     const conn = connectMysql;
     //add timestamps
-    const ULTIMA_MODIFICACION = new Date();
-    let usuarioKeys = [...Object.keys(usuario), "ULTIMA_MODIFICACION"];
-    let usuarioValues = [
-      ...Object.values(usuario),
-      ULTIMA_MODIFICACION,
-      ID_USUARIO,
+    const FECHA = new Date();
+    let tomaINventarioKeys = [...Object.keys(tomaINventario), "FECHA"];
+    let tomaINventarioValues = [
+      ...Object.values(tomaINventario),
+      FECHA,
+      ID_TOMA_INVENTARIO,
+      ID_LOCACION,
     ];
-    // check if contrasenia is being changed
-    for (let i = 0; i < usuarioKeys.length; i++) {
-      if (usuarioKeys[i] === "CONTRASENIA") {
-        usuarioValues[i] = Hasher.encode(usuarioValues[i]);
-      }
-    }
-    const query = `UPDATE USUARIO SET ${makeUpdateQuery(
-      usuarioKeys
-    )}  WHERE ID_USUARIO = ?`;
+
+    const query = `UPDATE TOMA_INVENTARIO_X_LOCACION SET ${makeUpdateQuery(
+      tomaINventarioKeys
+    )}  WHERE ID_TOMA_INVENTARIO = ? and ID_LOCACION = ?`;
 
     if (conn) {
-      conn.query(query, usuarioValues, (err, result) => {
+      conn.query(query, tomaINventarioValues, (err, result) => {
         if (err) {
-          console.log("Error al editar el usuario", err);
-          resolve(Response.error("Error al editar usuario"));
+          console.log("Error al editar la toma de inevntario", err);
+          resolve(Response.error("Error al editar toma de inevrntario"));
         } else {
           console.log(result);
           resolve(
-            Response.ok("success", result, "Se editó el usuario correctamente")
+            Response.ok(
+              "success",
+              result,
+              "Se editó la toma de inevntario correctamente"
+            )
+          );
+        }
+      });
+    } else {
+      resolve(Response.error("Error al conectar con la base de datos"));
+    }
+  });
+};
+/**
+ *
+ */
+const edit = (id, tomaINventario) => {
+  return new Promise((resolve, reject) => {
+    const ID_TOMA_INVENTARIO = id;
+    const conn = connectMysql;
+    //add timestamps
+    const FECHA_FIN = new Date();
+    let tomaINventarioKeys = [...Object.keys(tomaINventario), "FECHA_FIN"];
+    let tomaINventarioValues = [
+      ...Object.values(tomaINventario),
+      FECHA_FIN,
+      ID_TOMA_INVENTARIO,
+    ];
+
+    const query = `UPDATE TOMA_INVENTARIO SET ${makeUpdateQuery(
+      tomaINventarioKeys
+    )}  WHERE ID_TOMA_INVENTARIO = ?`;
+
+    if (conn) {
+      conn.query(query, tomaINventarioValues, (err, result) => {
+        if (err) {
+          console.log("Error al editar la toma de inevntario", err);
+          resolve(Response.error("Error al editar toma de inevrntario"));
+        } else {
+          console.log(result);
+          resolve(
+            Response.ok(
+              "success",
+              result,
+              "Se editó la toma de inevntario correctamente"
+            )
           );
         }
       });
@@ -166,7 +271,7 @@ const remove = (id) => {
     if (conn) {
       conn.query(query, (err, result) => {
         if (err) {
-          console.log("Error al eliminar el USUARIO", err);
+          console.log("Error al eliminar la toma de inevntario", err);
           resolve(Response.error("Error al eliminar USUARIO"));
         } else {
           console.log(result);
@@ -174,7 +279,7 @@ const remove = (id) => {
             Response.ok(
               "success",
               result,
-              "Se eliminó el USUARIO correctamente"
+              "Se eliminó la toma de inevntario correctamente"
             )
           );
         }
@@ -282,7 +387,7 @@ const listUsers = (filtros = { filtrosKeys: [], filtrosValues: [] }) => {
       makeFilterQuery(filtros) +
       ";";
     ///////////////////////
-console.log("query ", query);
+    console.log("query ", query);
     if (conn) {
       conn.query(query, (err, result) => {
         if (err) {

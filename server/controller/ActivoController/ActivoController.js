@@ -12,6 +12,7 @@ export class ActivoController {
     this.edit = edit;
     this.remove = remove;
     this.setFile = setFile;
+    this.counter = counter;
   }
 }
 
@@ -19,7 +20,10 @@ export class ActivoController {
 const list = (filtros = { filtrosKeys: [], filtrosValues: [] }) => {
   return new Promise((resolve, reject) => {
     const conn = connectMysql;
-    const query = `SELECT * FROM ACTIVO` + makeFilterQuery(filtros) + ";";
+    const query =
+      `SELECT * FROM ACTIVO` +
+      makeFilterQuery(filtros) +
+      "JOIN TAG ON TAG.ID_TAG = ACTIVO.ID_TAG;";
     if (conn) {
       conn.query(query, (err, result) => {
         if (err) {
@@ -74,16 +78,16 @@ const store = (activo) => {
     const values = activo.map((x) => [
       x.ID_TAG,
       x.ID_TIPO_ACTIVO,
-      x.ID_LOCACION ,
-      x.ID_ARCHIVO ,
+      x.ID_LOCACION,
+      x.ID_ARCHIVO,
       x.ID_AREA_RESPONSABLE,
       x.DENOMINACION,
       x.CARACTERISTICAS,
-      x.OBSERVACIONES ,
-      x.SERIE ,
-      x.COLOR ,
-      x.MODELO ,
-      x.MARCA ,
+      x.OBSERVACIONES,
+      x.SERIE,
+      x.COLOR,
+      x.MODELO,
+      x.MARCA,
       x.COSTO_ADQUISICION,
       x.NUM_GUIA_REMISION,
       x.NUM_FACTURA,
@@ -186,3 +190,28 @@ const remove = (id) => {
   });
 };
 const setFile = (id, file) => {};
+const counter = (ID_LOCACION) => {
+  return new Promise((resolve, reject) => {
+    const conn = connectMysql;
+    const query = `SELECT count(*) as CANT_ACTIVOS FROM ACTIVO as A where A.ID_LOCACION = ${ID_LOCACION};`;
+    if (conn) {
+      conn.query(query, (err, result) => {
+        if (err) {
+          console.log("Error al contar activos", err);
+          resolve(Response.error("Error al contar activo"));
+        } else {
+          console.log(result);
+          resolve(
+            Response.ok(
+              "success",
+              result[0],
+              "Se contar el activo correctamente"
+            )
+          );
+        }
+      });
+    } else {
+      resolve(Response.error("Error al conectar con la base de datos"));
+    }
+  });
+};
