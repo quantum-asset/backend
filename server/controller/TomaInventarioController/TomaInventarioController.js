@@ -61,17 +61,18 @@ const listActivoXTomaInventarioXLcacion = (
     }
   });
 };
-const addActivoXTomaInventarioXLcacion = () => {
+const addActivoXTomaInventarioXLcacion = (tomaInvenario) => {
   return new Promise(async (resolve, reject) => {
     const conn = connectMysql;
 
     const query = `INSERT INTO TOMA_INVENTARIO_X_LOCACION_X_ACTIVO (ID_TOMA_INVENTARIO_X_LOCACION, ID_ACTIVO, ID_USUARIO,FECHA,OBSERVACION,ENCONTRADO) VALUES ?`;
-    const FECHA_ACTUAL = new Date();
+    const FECHA = new Date();
+    //debe ir en orden de posicion enel query
     const values = tomaInvenario.map((x) => [
       x.ID_TOMA_INVENTARIO_X_LOCACION,
       x.ID_ACTIVO,
       x.ID_USUARIO,
-      FECHA_ACTUAL,
+      FECHA,
       x.OBSERVACION,
       x.ENCONTRADO,
     ]);

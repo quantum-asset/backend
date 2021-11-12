@@ -264,7 +264,7 @@ TomaInventarioRouter.get("/activo", async (req, res) => {
 TomaInventarioRouter.post("/activo", async (req, res) => {
   try {
     const respuestaTomaInventarioXActivo =
-      await controller.listActivoXTomaInventarioXLcacion(req.body);
+      await controller.addActivoXTomaInventarioXLcacion(req.body);
     res.status(200).send(respuestaTomaInventarioXActivo);
   } catch (error) {
     console.log("error", error);
