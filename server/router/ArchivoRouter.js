@@ -76,7 +76,7 @@ ArchivoRouter.get("/obtener/:id", async (req, res) => {
         respuesta
       );
       // const fs = require("fs").promises;
-      const { NOMBRE_ARCHIVO, RUTA } = respuesta.payload[0];
+      const { NOMBRE_ARCHIVO, RUTA ,TIPO_ARCHIVO} = respuesta.payload[0];
       console.log("retrieve file " + `${RUTA}${NOMBRE_ARCHIVO}`);
       const contentBase64 = await fs.promises.readFile(
         `${RUTA}${NOMBRE_ARCHIVO}`,
@@ -84,7 +84,7 @@ ArchivoRouter.get("/obtener/:id", async (req, res) => {
           encoding: "base64",
         }
       );
-      console.log("retrieve file ", contentBase64);
+      console.log("retrieve file ", `data:${TIPO_ARCHIVO};base64,${contentBase64.slice(0,28)}`);
 
       res
         .status(200)
