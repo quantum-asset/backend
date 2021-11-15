@@ -3,7 +3,7 @@ import mysql from "mysql";
 import { ArchivoController } from "../controller/ArchivoController/ArchivoController.js";
 import { UsuarioController } from "../controller/UsuarioController/UsuarioController.js";
 import { Response } from "../response/Response.js";
-
+import * as fs from "fs";
 const ArchivoRouter = express.Router();
 const controller = new ArchivoController();
 const userController = new UsuarioController();
@@ -75,13 +75,16 @@ ArchivoRouter.get("/obtener/:id", async (req, res) => {
         "respuesta obtener file con id " + req.params.id + " ",
         respuesta
       );
-      const fs = require("fs").promises;
+      // const fs = require("fs").promises;
       const { NOMBRE_ARCHIVO, RUTA } = respuesta.payload[0];
-      console.log("retrieve file "+`${NOMBRE_ARCHIVO}/${RUTA}` );
-      const contentBase64 = await fs.readFile(`${NOMBRE_ARCHIVO}/${RUTA}`, {
-        encoding: "base64",
-      });
-      console.log("retrieve file ",contentBase64 );
+      console.log("retrieve file " + `${NOMBRE_ARCHIVO}/${RUTA}`);
+      const contentBase64 = await fs.promises.readFile(
+        `${NOMBRE_ARCHIVO}/${RUTA}`,
+        {
+          encoding: "base64",
+        }
+      );
+      console.log("retrieve file ", contentBase64);
 
       res
         .status(200)
@@ -94,7 +97,7 @@ ArchivoRouter.get("/obtener/:id", async (req, res) => {
         );
       // res.sendFile(`${NOMBRE_ARCHIVO}`, { root: `${RUTA}` });
     } else {
-    console.log("error else, no hay repuesta BD", error);
+      console.log("error else, no hay repuesta BD", error);
 
       res
         .status(500)
