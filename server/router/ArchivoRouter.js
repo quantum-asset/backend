@@ -71,7 +71,7 @@ ArchivoRouter.get("/obtener/:id", async (req, res) => {
   try {
     const respuesta = await controller.getFileById(req.params.id);
     if (respuesta) {
-      const {NOMBRE_ARCHIVO,RUTA}=respuesta;
+      const {NOMBRE_ARCHIVO,RUTA}=respuesta.payload[0];
       res.sendFile(`${NOMBRE_ARCHIVO}`, { root: `${RUTA}` });
     } else {
       res.status(500).send(Response.error("Ocurrió un error inesperado"));
