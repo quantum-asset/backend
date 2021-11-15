@@ -79,7 +79,7 @@ ArchivoRouter.get("/obtener/:id", async (req, res) => {
       const { NOMBRE_ARCHIVO, RUTA } = respuesta.payload[0];
       console.log("retrieve file " + `${RUTA}${NOMBRE_ARCHIVO}`);
       const contentBase64 = await fs.promises.readFile(
-        `${NOMBRE_ARCHIVO}/${RUTA}`,
+        `${RUTA}${NOMBRE_ARCHIVO}`,
         {
           encoding: "base64",
         }
