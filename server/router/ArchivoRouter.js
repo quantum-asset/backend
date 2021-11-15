@@ -77,7 +77,7 @@ ArchivoRouter.get("/obtener/:id", async (req, res) => {
       );
       // const fs = require("fs").promises;
       const { NOMBRE_ARCHIVO, RUTA } = respuesta.payload[0];
-      console.log("retrieve file " + `${NOMBRE_ARCHIVO}/${RUTA}`);
+      console.log("retrieve file " + `${RUTA}/${NOMBRE_ARCHIVO}`);
       const contentBase64 = await fs.promises.readFile(
         `${NOMBRE_ARCHIVO}/${RUTA}`,
         {
