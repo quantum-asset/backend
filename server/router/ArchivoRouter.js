@@ -49,10 +49,11 @@ ArchivoRouter.get("/:id", async (req, res) => {
       res.status(500).send(Response.error("Ocurrió un error inesperado"));
     }
   } catch (error) {
-    res.status(500).send(Response.error("Ocurrió un error inesperado"));
+    res
+      .status(500)
+      .send(Response.error("Ocurrió un error inesperado en catch", error));
   }
 });
-
 
 /**
 
@@ -67,17 +68,24 @@ ArchivoRouter.get("/:id", async (req, res) => {
         }
  */
 ArchivoRouter.get("/obtener/:id", async (req, res) => {
-
   try {
     const respuesta = await controller.getFileById(req.params.id);
     if (respuesta) {
-      const {NOMBRE_ARCHIVO,RUTA}=respuesta.payload[0];
+      console.log(
+        "respuesta obtener file con id " + req.params.id + " ",
+        respuesta
+      );
+      const { NOMBRE_ARCHIVO, RUTA } = respuesta.payload[0];
       res.sendFile(`${NOMBRE_ARCHIVO}`, { root: `${RUTA}` });
     } else {
-      res.status(500).send(Response.error("Ocurrió un error inesperado"));
+      res
+        .status(500)
+        .send(Response.error("Ocurrió un error inesperado en else"));
     }
   } catch (error) {
-    res.status(500).send(Response.error("Ocurrió un error inesperado"));
+    res
+      .status(500)
+      .send(Response.error("Ocurrió un error inesperado en catch", error));
   }
 });
 //editar uno
@@ -104,7 +112,10 @@ ArchivoRouter.post("/usuario/:id", async (req, res) => {
       //// falta el mover archivopoooooo
       if (status.includes("success")) {
         const { insertId } = payload;
-        console.log("se registro la imagen en la BD, en el payload esta el id",insertId);
+        console.log(
+          "se registro la imagen en la BD, en el payload esta el id",
+          insertId
+        );
         const userResponse = await userController.edit(req.params.id, {
           ID_ARCHIVO: insertId,
         });
