@@ -5,9 +5,9 @@
  * @param imageFile the image file
  * @returns the new file name generated
  */
-export const moveImageToStorageLocation = async (imageFile, fileName) => {
+export const moveImageToStorageLocation = async (imageFile, filePath) => {
   return new Promise((resolve, reject) => {
-    imageFile.mv(`./uploads/${fileName}`, (err) => {
+    imageFile.mv(filePath, (err) => {
       if (err) {
         resolve({ success: false, error: err });
       } else {

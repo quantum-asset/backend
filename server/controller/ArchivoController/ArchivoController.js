@@ -78,7 +78,7 @@ export class ArchivoController {
       //aqui debo guardarlo en la ruta del  del EFS
       const { success, error } = await moveImageToStorageLocation(
         file,
-        newHashedName
+        `${ruta}/${newHashedName}`
       );
 
       if (!success) {
