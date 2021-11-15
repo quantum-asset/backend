@@ -52,6 +52,34 @@ ArchivoRouter.get("/:id", async (req, res) => {
     res.status(500).send(Response.error("Ocurrió un error inesperado"));
   }
 });
+
+
+/**
+
+ {
+            "ID_ARCHIVO": 1,
+            "TIPO_ARCHIVO": "image/jpeg",
+            "NOMBRE_ARCHIVO": "ad1b3273f43533101af6af3762e9db214e607fbc97aad13f68823ce3a674d9a1ad1b3273f43533101af6af3762e9db214e607fbc97aad13f68823ce3a674d9a1",
+            "RUTA": "/home/ubuntu/files/",
+            "FECHA_CREACION": "2021-11-15T00:21:34.000Z",
+            "ULTIMA_MODIFICACION": "2021-11-15T00:21:34.000Z",
+            "ESTADO": 1
+        }
+ */
+ArchivoRouter.get("/obtener/:id", async (req, res) => {
+
+  try {
+    const respuesta = await controller.getFileById(req.params.id);
+    if (respuesta) {
+      const {NOMBRE_ARCHIVO,RUTA}=respuesta;
+      res.sendFile(`${NOMBRE_ARCHIVO}`, { root: `${RUTA}` });
+    } else {
+      res.status(500).send(Response.error("Ocurrió un error inesperado"));
+    }
+  } catch (error) {
+    res.status(500).send(Response.error("Ocurrió un error inesperado"));
+  }
+});
 //editar uno
 ArchivoRouter.put("", async (req, res) => {});
 
