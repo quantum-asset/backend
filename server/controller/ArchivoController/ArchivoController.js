@@ -82,7 +82,7 @@ export class ArchivoController {
       );
 
       if (!success) {
-        resolve(Response.error("Error al insertar archivo"));
+        resolve(Response.error("Error al guardar archivo"));
       } else if (conn) {
         conn.query(query, [values], async (err, result) => {
           if (err) {
