@@ -91,7 +91,7 @@ ArchivoRouter.get("/obtener/:id", async (req, res) => {
         .send(
           Response.ok(
             "success",
-            { file: contentBase64 },
+            { file: `data:${TIPO_ARCHIVO};base64,${contentBase64}` },
             "Se decodifico el archivo"
           )
         );
