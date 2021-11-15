@@ -75,8 +75,21 @@ ArchivoRouter.get("/obtener/:id", async (req, res) => {
         "respuesta obtener file con id " + req.params.id + " ",
         respuesta
       );
+      const fs = require("fs").promises;
       const { NOMBRE_ARCHIVO, RUTA } = respuesta.payload[0];
-      res.sendFile(`${NOMBRE_ARCHIVO}`, { root: `${RUTA}` });
+      const contentBase64 = await fs.readFile(`${NOMBRE_ARCHIVO}/${RUTA}`, {
+        encoding: "base64",
+      });
+      res
+        .status(200)
+        .send(
+          Response.ok(
+            "success",
+            { file: contentBase64 },
+            "Se decodifico el archivo"
+          )
+        );
+      // res.sendFile(`${NOMBRE_ARCHIVO}`, { root: `${RUTA}` });
     } else {
       res
         .status(500)
