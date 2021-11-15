@@ -77,9 +77,12 @@ ArchivoRouter.get("/obtener/:id", async (req, res) => {
       );
       const fs = require("fs").promises;
       const { NOMBRE_ARCHIVO, RUTA } = respuesta.payload[0];
+      console.log("retrieve file "+`${NOMBRE_ARCHIVO}/${RUTA}` );
       const contentBase64 = await fs.readFile(`${NOMBRE_ARCHIVO}/${RUTA}`, {
         encoding: "base64",
       });
+      console.log("retrieve file ",contentBase64 );
+
       res
         .status(200)
         .send(
@@ -91,11 +94,14 @@ ArchivoRouter.get("/obtener/:id", async (req, res) => {
         );
       // res.sendFile(`${NOMBRE_ARCHIVO}`, { root: `${RUTA}` });
     } else {
+    console.log("error else, no hay repuesta BD", error);
+
       res
         .status(500)
         .send(Response.error("Ocurrió un error inesperado en else"));
     }
   } catch (error) {
+    console.log("error catch", error);
     res
       .status(500)
       .send(Response.error("Ocurrió un error inesperado en catch", error));

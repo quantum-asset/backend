@@ -33,7 +33,7 @@ export class ArchivoController {
               Response.ok(
                 "success",
                 result,
-                "Se listaron los Tomas de inventario correctamente"
+                "Se listaron las imagenes correctamente"
               )
             );
           }
