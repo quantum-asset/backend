@@ -17,7 +17,7 @@ export class ArchivoController {
       const conn = connectMysql;
       const query = `SELECT * FROM ARCHIVO WHERE ID_ARCHIVO=${ID_ARCHIVO}`;
       //me devulve un array de archivos pero necesito el primero
-
+      console.log("query", query);
       if (conn) {
         conn.query(query, (err, result) => {
           if (err) {
