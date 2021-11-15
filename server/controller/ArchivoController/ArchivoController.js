@@ -82,6 +82,7 @@ export class ArchivoController {
       );
 
       if (!success) {
+        console.log("error en mv", error);
         resolve(Response.error("Error al guardar archivo"));
       } else if (conn) {
         conn.query(query, [values], async (err, result) => {
