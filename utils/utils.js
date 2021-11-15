@@ -35,6 +35,7 @@ export class Hasher {
   constructor() {
     Hasher.encode = encode;
     Hasher.compare = compare;
+    ////////////////////////
     Hasher.random = random;
     Hasher.token = token;
   }

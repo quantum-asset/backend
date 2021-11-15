@@ -19,6 +19,7 @@ import { Scheduler } from "./utils/scheduler.js";
 import { SesionRouter } from "./server/router/SesionRouter.js";
 import { NecesidadTagRouter } from "./server/router/NecesidadTagRouter.js";
 import { TomaInventarioRouter } from "./server/router/TomaInventarioRouter.js";
+import { ArchivoRouter } from "./server/router/ArchivoRouter.js";
 /*
 1) agregar auditoria en cada post, put y delete de los controllers
 */
@@ -75,7 +76,7 @@ app.use("/sesion", SesionRouter);
 app.use("/necesidad-tag", NecesidadTagRouter);
 
 app.use("/toma-inventario", TomaInventarioRouter);
-
+app.use("/archivo", ArchivoRouter);
 /*
 
 app.use("/transaccion", TransaccionRouter);

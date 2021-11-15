@@ -1,42 +1,110 @@
 import express from "express";
 import mysql from "mysql";
-import { Response } from "../response/Response";
+import { ArchivoController } from "../controller/ArchivoController/ArchivoController.js";
+import { UsuarioController } from "../controller/UsuarioController/UsuarioController.js";
+import { Response } from "../response/Response.js";
 
 const ArchivoRouter = express.Router();
-
+const controller = new ArchivoController();
+const userController = new UsuarioController();
 //ArchivoRouter = express.Router();
 
+//insertar 1 o varios
+ArchivoRouter.post("", async (req, res) => {
+  try {
+    if (!req.files || req.files.file) {
+      res.send(Response.error("No se enviaron archivos"));
+    } else {
+      const file = req.files.file;
+      const respuesta = await controller.store(file);
+      if (respuesta) {
+        res.status(200).send(respuesta);
+      } else {
+        res.status(500).send(Response.error("Ocurrió un error inesperado"));
+      }
+    }
+  } catch (error) {
+    res.status(500).send(Response.error("Ocurrió un error inesperado"));
+  }
+});
+//listar mock
+ArchivoRouter.get("", async (req, res) => {
+  try {
+    const fileName =
+      "7eda481a31038f1d1917c341706810afdb2fbd1a98d80c6b2d8d437abcb0c5307eda481a31038f1d1917c341706810afdb2fbd1a98d80c6b2d8d437abcb0c530";
+    //res.sendFile(`${process.env.RUTA_ARCHIVOS}/${fileName}`);
+    // res.sendFile(`./uploads/${fileName}`);
+    res.sendFile(`${fileName}`, { root: `./uploads` });
+  } catch (error) {
+    res.status(500).send(Response.error("Ocurrió un error inesperado" + error));
+  }
+});
 //listar todo
-ArchivoRouter.get("/archivo/:id", (req, res) => {});
-
-//insertar 1 o varios
-ArchivoRouter.post("/archivo", (req, res) => {});
-
-//editar uno
-ArchivoRouter.put("/archivo", (req, res) => {});
-
-//editar uno
-ArchivoRouter.patch("/archivo", (req, res) => {});
-
-//eliminar 1
-ArchivoRouter.delete("/archivo/:id", (req, res) => {});
-
-//insertar 1 o varios
-ArchivoRouter.post("/archivo/usuario/:id", (req, res) => {
-  if (!req.files || req.files.file) {
-    res.send(Response.error("No se enviaron archivos"));
-  } else {
-    const respuesta = await controller.storeFileUser(req.params.id, req.files.file);
-
+ArchivoRouter.get("/:id", async (req, res) => {
+  try {
+    const respuesta = await controller.getFileById(req.params.id);
     if (respuesta) {
       res.status(200).send(respuesta);
     } else {
       res.status(500).send(Response.error("Ocurrió un error inesperado"));
     }
+  } catch (error) {
+    res.status(500).send(Response.error("Ocurrió un error inesperado"));
+  }
+});
+//editar uno
+ArchivoRouter.put("", async (req, res) => {});
+
+//editar uno
+ArchivoRouter.patch("", async (req, res) => {});
+
+//eliminar 1
+ArchivoRouter.delete("/:id", async (req, res) => {});
+
+//insertar 1 o varios
+ArchivoRouter.post("/usuario/:id", async (req, res) => {
+  console.log("llamada al insertar foto de usuario");
+  try {
+    if (!req.files || !req.files.file) {
+      res.send(Response.error("No se enviaron archivos"));
+    } else {
+      const responseArchivo = await controller.storeFileUser(
+        req.params.id,
+        req.files.file
+      );
+      const { status, payload, message } = responseArchivo;
+      //// falta el mover archivopoooooo
+      if (status.includes("success")) {
+        const { insertId } = payload;
+        console.log("se registro la imagen en la BD, en el payload esta el id",insertId);
+        const userResponse = await userController.edit(req.params.id, {
+          ID_ARCHIVO: insertId,
+        });
+
+        res.status(200).send(
+          Response.ok(
+            "success",
+            {
+              usuarioResponse: userResponse,
+              archivoReponse: responseArchivo,
+            },
+            "se guardo xdd SIMULACION linea 87"
+          )
+        );
+      } else {
+        res
+          .status(500)
+          .send(
+            Response.error("Ocurrió un error al insertar el archivo de imagen")
+          );
+      }
+    }
+  } catch (error) {
+    res.status(500).send(Response.error("Ocurrió un error inesperado"));
   }
 });
 
 //insertar 1 o varios
-ArchivoRouter.post("/archivo/activo/:id", (req, res) => {});
+ArchivoRouter.post("/activo/:id", async (req, res) => {});
 
 export { ArchivoRouter };
