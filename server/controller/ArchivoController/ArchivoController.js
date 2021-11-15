@@ -59,7 +59,7 @@ export class ArchivoController {
       //add timestamps
       //console.log("sha", SHA);
       //console.log("h256", sha256);
-      const newHashedName = `${Hasher.random()}.${ext}`;
+      const newHashedName = `${Hasher.random().slice(0,124)}.${ext}`;
      // resolve({ ok: true, newHashedName: newHashedName });
       //return;
       const ruta = process.env.RUTA_ARCHIVOS;
