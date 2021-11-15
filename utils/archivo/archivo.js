@@ -16,3 +16,36 @@ export const moveImageToStorageLocation = async (imageFile, filePath) => {
     });
   });
 };
+
+/**
+ * Looks for the first file extension
+ * @param fileName file name
+ * @returns the file name extension
+ */
+ export const getExt = (fileName) => {
+  const re = /(?:\.([^.]+))?$/;
+  const result = re.exec(fileName);
+  if (result) {
+      return result[1];
+  } else {
+      return "";
+  }
+
+};
+
+
+/**
+ * Looks for the first file extension
+ * @param fileName file name
+ * @returns the file name extension
+ */
+ export const getExtFromMime = (mimeFile) => {
+  switch(mimeFile){
+    case "image/jpeg": return "jpg";
+    case "image/jpg": return "jpg";
+    case "image/png": return "png";
+    /* case "image/jpeg": return "jpg";
+    case "image/jpeg": return "jpg"; */
+    default: return "jpg";
+  }
+};

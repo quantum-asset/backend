@@ -1,4 +1,8 @@
-import { moveImageToStorageLocation } from "../../../utils/archivo/archivo.js";
+import {
+  getExt,
+  getExtFromMime,
+  moveImageToStorageLocation,
+} from "../../../utils/archivo/archivo.js";
 import { Hasher } from "../../../utils/utils.js";
 import { connectMysql } from "../../mysql_conector.js";
 import { Response } from "../../response/Response.js";
@@ -46,12 +50,18 @@ export class ArchivoController {
     return new Promise(async (resolve, reject) => {
       console.log("idUser", idUser);
       console.log("file", file);
+      let ext = getExt(file.name);
+      if (ext.length === 0) {
+        ext = getExtFromMime(file.mimetype);
+      }
 
       const conn = connectMysql;
       //add timestamps
       //console.log("sha", SHA);
       //console.log("h256", sha256);
-      const newHashedName = Hasher.random();
+      const newHashedName = `${Hasher.random()}.${ext}`;
+     // resolve({ ok: true, newHashedName: newHashedName });
+      //return;
       const ruta = process.env.RUTA_ARCHIVOS;
       const fileToSend = {
         TIPO_ARCHIVO: file.mimetype,
